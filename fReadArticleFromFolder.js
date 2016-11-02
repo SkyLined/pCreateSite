@@ -46,6 +46,7 @@ function fReadArticleFromFolder(sBaseFolderPath, sArticleFolderName, fCallback) 
         "uYear": uYear, "uMonth": uMonth, "uDay": uDay, "uIndex": uIndex,
         "uSequenceNumber": uArticleSequenceNumber,
         "sTitle": void 0,
+        "sSummary": void 0,
         "sSynopsisHTML": void 0,
         "asIcons": [],
         "aoSections": [],
@@ -56,13 +57,16 @@ function fReadArticleFromFolder(sBaseFolderPath, sArticleFolderName, fCallback) 
     // dxArticle
     if (typeof dxArticle != "object") return fCallback(new Error("dxArticle is not an object in " + sArticleJSONFilePath));
     for (sSetting in dxArticle) {
-      if (!(sSetting in {"sTitle":0, "asIcons":0, "sSynopsisFileName":0, "adxSections":0})) {
+      if (!(sSetting in {"sTitle":0, "sSummary":0, "asIcons":0, "sSynopsisFileName":0, "adxSections":0})) {
         return fCallback(new Error("dxArticle." + sSetting + " is not a known article setting in " + sArticleJSONFilePath));
       };
     };
     // dxArticle.sTitle
     if (typeof dxArticle.sTitle != "string") return fCallback(new Error("dxArticle.sTitle is not a string in " + sArticleJSONFilePath));
     oArticle.sTitle = dxArticle.sTitle;
+    // dxArticle.sSummary
+    if (typeof dxArticle.sSummary != "string") return fCallback(new Error("dxArticle.sSummary is not a string in " + sArticleJSONFilePath));
+    oArticle.sSummary = dxArticle.sSummary;
     // dxArticle.asIcons
     if (!(dxArticle.asIcons instanceof Array)) return fCallback(new Error("dxArticle.asIcons is not an array in " + sArticleJSONFilePath));
     var bErrorReported = false;

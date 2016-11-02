@@ -32,6 +32,8 @@ function fCreateMainPage(oSite, dsTemplate_by_sName, fCallback) {
           .replace(/<<Index articles>>/g, asArticlesHTML.join("")),
       sPageHTML = dsTemplate_by_sName["Page"]
           .replace(/<<Title>>/g, oSite.sTitle)
+          .replace(/<<Summary>>/g, oSite.sSummary)
+          .replace(/<<AbsoluteSiteURL>>/g, oSite.sAbsoluteURL)
           .replace(/<<Page content>>/g, sPageContentHTML);
   var asFailedSubstitution = sPageHTML.match(/<<.*?>>/);
   if (asFailedSubstitution)

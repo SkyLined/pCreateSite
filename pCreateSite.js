@@ -21,20 +21,21 @@ if (!sInputFolderPath || !sOutputFolderPath) {
 } else {
   fReadJSONFile(mPath.join(sInputFolderPath, "Settings.json"), function (oError, dxSettings) {
     if (oError) throw oError;
-    var sTemplatesFolderPath = mPath.join(sInputFolderPath, dxSettings["Templates folder path"]),
-        sArticlesFolderPath = mPath.join(sInputFolderPath, dxSettings["Articles folder path"]),
-        sStaticFolderPath = mPath.join(sInputFolderPath, dxSettings["Statics folder path"]),
-        sAbsoluteBaseURL = dxSettings["Absolute base URL"],
-        sRelativeBaseURL = dxSettings["Relative base URL"];
+    var sTemplatesFolderPath = mPath.join(sInputFolderPath, dxSettings["sTemplatesFolderPath"]),
+        sArticlesFolderPath = mPath.join(sInputFolderPath, dxSettings["sArticlesFolderPath"]),
+        sStaticFolderPath = mPath.join(sInputFolderPath, dxSettings["sStaticFolderPath"]),
+        sAbsoluteBaseURL = dxSettings["sAbsoluteBaseURL"],
+        sRelativeBaseURL = dxSettings["sRelativeBaseURL"];
     fReadTemplatesFromFolder(sTemplatesFolderPath, function (oError, dsTemplate_by_sName) {
       if (oError) throw oError;
       fReadArticlesFromFolder(sArticlesFolderPath, function (oError, aoArticles) {
         if (oError) throw oError;
         var oSite = {
-              "sTitle": dxSettings["Title"],
-              "sDescription": dxSettings["Description"],
+              "sTitle": dxSettings["sTitle"],
+              "sSummary": dxSettings["sSummary"],
               "sMainPageHTMLFilePath": mPath.join(sOutputFolderPath, "index.html"),
               "sRSSFeedXMLFilePath": mPath.join(sOutputFolderPath, "rss.xml"),
+              "sAbsoluteURL": sAbsoluteBaseURL,
               "sMainPageAbsoluteURL": sAbsoluteBaseURL + "index.html",
               "sMainPageRelativeURL": sRelativeBaseURL + "index.html",
               "aoArticles": aoArticles

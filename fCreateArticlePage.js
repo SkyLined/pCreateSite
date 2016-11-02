@@ -27,7 +27,9 @@ function fCreateArticlePage(oArticle, dsTemplate_by_sName, fCallback) {
       sPageContentHTML = dsTemplate_by_sName["Article page content"]
           .replace(/<<Article sections>>/g, asSectionsHTML.join("")),
       sPageHTML = dsTemplate_by_sName["Page"]
-          .replace(/<<Title>>/g, oArticle.oSite.sTitle + " - " + oArticle.sTitle)
+          .replace(/<<Title>>/g, oArticle.sTitle)
+          .replace(/<<Summary>>/g, oArticle.sSummary)
+          .replace(/<<AbsoluteSiteURL>>/g, oArticle.oSite.sAbsoluteURL)
           .replace(/<<Page content>>/g, sPageContentHTML);
   var asFailedSubstitution = sPageHTML.match(/<<.*?>>/);
   if (asFailedSubstitution)
