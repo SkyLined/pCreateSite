@@ -13,24 +13,24 @@ function fCreateArticlePage(oArticle, dsTemplate_by_sName, fCallback) {
         if (!sSectionHTML)
             return fCallback(new Error("No article section template found for section type " + JSON.stringify(oSection.sType)));
         if (oSection.sName) {
-          sSectionHTML = sSectionHTML.replace(/<<Section name>>/g, fsHTMLEncodeEntities(oSection.sName));
+          sSectionHTML = sSectionHTML.replace(/<<sSectionName>>/g, fsHTMLEncodeEntities(oSection.sName));
         };
         if (oSection.sContentHTML) {
-          sSectionHTML = sSectionHTML.replace(/<<Section content>>/g, oSection.sContentHTML);
+          sSectionHTML = sSectionHTML.replace(/<<sSectionContentHTML>>/g, oSection.sContentHTML);
         };
         if (oSection.sAttachmentData) {
           var sAttachmentRelativeURL = oArticle.sAttachmentsRelativeBaseURL + encodeURIComponent(oSection.sAttachmentFileName);
-          sSectionHTML = sSectionHTML.replace(/<<Attachment URL>>/g, sAttachmentRelativeURL);
+          sSectionHTML = sSectionHTML.replace(/<<sAttachmentURL>>/g, fsHTMLEncodeEntities(sAttachmentRelativeURL));
         };
         return sSectionHTML;
       });
       sPageContentHTML = dsTemplate_by_sName["Article page content"]
-          .replace(/<<Article sections>>/g, asSectionsHTML.join("")),
+          .replace(/<<sArticleSectionsHTML>>/g, asSectionsHTML.join("")),
       sPageHTML = dsTemplate_by_sName["Page"]
-          .replace(/<<Title>>/g, oArticle.sTitle)
-          .replace(/<<Summary>>/g, oArticle.sSummary)
-          .replace(/<<AbsoluteSiteURL>>/g, oArticle.oSite.sAbsoluteURL)
-          .replace(/<<Page content>>/g, sPageContentHTML);
+          .replace(/<<sTitle>>/g, fsHTMLEncodeEntities(oArticle.sTitle))
+          .replace(/<<sSummary>>/g, fsHTMLEncodeEntities(oArticle.sSummary))
+          .replace(/<<sAbsoluteSiteURL>>/g, fsHTMLEncodeEntities(oArticle.oSite.sAbsoluteURL))
+          .replace(/<<sPageContentHTML>>/g, sPageContentHTML);
   var asFailedSubstitution = sPageHTML.match(/<<.*?>>/);
   if (asFailedSubstitution)
       throw new Error("The substition failed for " + asFailedSubstitution[0] + " in an article page.");
