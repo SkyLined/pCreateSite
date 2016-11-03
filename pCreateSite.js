@@ -26,7 +26,7 @@ if (!sInputFolderPath || !sOutputFolderPath) {
         sStaticFolderPath = mPath.join(sInputFolderPath, dxSettings["sStaticFolderPath"]),
         sAbsoluteBaseURL = dxSettings["sAbsoluteBaseURL"],
         sRelativeBaseURL = dxSettings["sRelativeBaseURL"];
-    fReadTemplatesFromFolder(sTemplatesFolderPath, function (oError, dsTemplate_by_sName) {
+    fReadTemplatesFromFolder(sTemplatesFolderPath, function (oError, dsTemplate_by_sFileName) {
       if (oError) throw oError;
       fReadArticlesFromFolder(sArticlesFolderPath, function (oError, aoArticles) {
         if (oError) throw oError;
@@ -50,7 +50,7 @@ if (!sInputFolderPath || !sOutputFolderPath) {
           oArticle.sAttachmentsAbsoluteBaseURL = sAbsoluteBaseURL + encodeURIComponent(sArticleID) + "/";
           oArticle.sAttachmentsRelativeBaseURL = sRelativeBaseURL + encodeURIComponent(sArticleID) + "/";
         });
-        fCreateSite(oSite, dsTemplate_by_sName, function (oError) {
+        fCreateSite(oSite, dsTemplate_by_sFileName, function (oError) {
           if (oError) throw oError;
           fCopyFolder(sStaticFolderPath, sOutputFolderPath, function (oError) {
             if (oError) throw oError;

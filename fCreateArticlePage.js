@@ -2,14 +2,9 @@ module.exports = fCreateArticlePage;
 var fsHTMLEncodeEntities = require("./fsHTMLEncodeEntities"),
     fWriteFile = require("./fWriteFile");
 
-function fCreateArticlePage(oArticle, dsTemplate_by_sName, fCallback) {
-  var dsSectionTemplate_by_sTypeName = {
-        "Text": dsTemplate_by_sName["Article text section"],
-        "Source code": dsTemplate_by_sName["Article source code section"],
-        "BugId report": dsTemplate_by_sName["Article BugId report section"],
-      },
-      asSectionsHTML = oArticle.aoSections.map(function (oSection) {
-        var sSectionHTML = dsSectionTemplate_by_sTypeName[oSection.sType];
+function fCreateArticlePage(oArticle, dsTemplate_by_sFileName, fCallback) {
+  var asSectionsHTML = oArticle.aoSections.map(function (oSection) {
+        var sSectionHTML = dsTemplate_by_sFileName["Article section " + oSection.sType + ".html"];
         if (!sSectionHTML)
             return fCallback(new Error("No article section template found for section type " + JSON.stringify(oSection.sType)));
         if (oSection.sName) {
@@ -24,9 +19,9 @@ function fCreateArticlePage(oArticle, dsTemplate_by_sName, fCallback) {
         };
         return sSectionHTML;
       });
-      sPageContentHTML = dsTemplate_by_sName["Article page content"]
+      sPageContentHTML = dsTemplate_by_sFileName["Article.html"]
           .replace(/<<sArticleSectionsHTML>>/g, asSectionsHTML.join("")),
-      sPageHTML = dsTemplate_by_sName["Page"]
+      sPageHTML = dsTemplate_by_sFileName["Page.html"]
           .replace(/<<sTitle>>/g, fsHTMLEncodeEntities(oArticle.sTitle))
           .replace(/<<sSummary>>/g, fsHTMLEncodeEntities(oArticle.sSummary))
           .replace(/<<sAbsoluteSiteURL>>/g, fsHTMLEncodeEntities(oArticle.oSite.sAbsoluteURL))

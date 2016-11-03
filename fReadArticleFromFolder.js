@@ -4,7 +4,8 @@ var mPath = require("path"),
     fReadFileAsHTML = require("./fReadFileAsHTML"),
     fsHTMLDecodeEntities = require("./fsHTMLDecodeEntities"),
     fReadJSONFile = require("./fReadJSONFile"),
-    mHighlight = require("highlight.js");
+    mHighlight = require("highlight.js"),
+    fReadBugIdReportSectionFromFile = require("./fReadBugIdReportSectionFromFile");
 
 // Each article folder should follow the format "YYYY-MM-DD#I ...", where "YYYY" is the year, "MM" is the month, "DD"
 // is the day, and "I" is an index (optional, defaults to 1, useful if you have more than one post in one day).
@@ -18,15 +19,7 @@ var rArticleFolderNameSequenceNumber = /^((\d{4})\-(\d{2})\-(\d{2}))(?:\#(\d+))?
       ".svg":     "SVG",
       ".js":      "Javascript",
       ".py":      "Python",
-    },
-    // BugId has changed over the years, so there are multiple formats we need to be able to parse:
-    rBugIdSynopsis = /(<table>[\s\S]+?<\/table>)|<FIELDSET[^>]*><LEGEND[^>]*>Cdb event information<\/LEGEND><SPAN>(<PRE>[\s\S]*?<\/PRE>)/i,
-    //                 '- Most recent format -'  '--- old format -----------------------------------------------------------------'
-    rBugId = /<tr><td>Id:\s*&nbsp;<\/td><td><span class="Important">(.+?)<\/span><\/td><\/tr>|id:\s+(.+?)[\r\n]/i,
-    //        '- Most recent format --------------------------------------------------------'  ' old format '
-    rBugLocation = /<tr><td>Location:\s*&nbsp;<\/td><td><span class="Important">(.+?)<\/span><\/td><\/tr>|description:.*? in (.*?)[\r\n]/i
-    //              '- Most recent format --------------------------------------------------------------' '--- old format -----------'
-    rBugIdSynopsisStrip = /\s+class="[^"]*"/gi;
+    };
 
 function fReadArticleFromFolder(sBaseFolderPath, sArticleFolderName, fCallback) {
   var sArticleFolderPath = mPath.join(sBaseFolderPath, sArticleFolderName),
@@ -125,7 +118,7 @@ function fReadArticleFromFolder(sBaseFolderPath, sArticleFolderName, fCallback) 
                 return fCallback(oError);
               }
               oArticle.aoSections[uIndex] = {
-                "sType": "Text",
+                "sType": "text",
                 "sContentHTML": sContentHTML
               };
               if (++uSectionFilesRead == dxArticle.adxSections.length) return fCallback(null, oArticle);
@@ -141,7 +134,7 @@ function fReadArticleFromFolder(sBaseFolderPath, sArticleFolderName, fCallback) 
               if (oError) {
                 bErrorReported = true;
                 return fCallback(oError);
-              }
+              };
               try {
                 sSourceCodeHTML = mHighlight.highlight(sLanguage, sSourceCode, false).value;
               } catch (oError) {
@@ -149,7 +142,7 @@ function fReadArticleFromFolder(sBaseFolderPath, sArticleFolderName, fCallback) 
                 return fCallback(oError);
               };
               oArticle.aoSections[uIndex] = {
-                "sType": "Source code",
+                "sType": "source code",
                 "sName": dxSection.sAttachmentFileName || dxSection.sFileName,
                 "sContentHTML": sSourceCodeHTML,
                 "sAttachmentFileName": dxSection.sAttachmentFileName || dxSection.sFileName,
@@ -158,37 +151,13 @@ function fReadArticleFromFolder(sBaseFolderPath, sArticleFolderName, fCallback) 
               if (++uSectionFilesRead == dxArticle.adxSections.length) return fCallback(null, oArticle);
             });
           case "BugId report":
-            return fReadFile(sSectionFilePath, function (oError, sBugIdReportHTML) {
+            return fReadBugIdReportSectionFromFile(sSectionFilePath, dxSection, function (oError, oSection) {
               if (bErrorReported) return;
               if (oError) {
                 bErrorReported = true;
                 return fCallback(oError);
-              }
-              var asBugIdSynopsisMatch = sBugIdReportHTML.match(rBugIdSynopsis),
-                  sBugIdSynopsisHTML = asBugIdSynopsisMatch && (asBugIdSynopsisMatch[1] || asBugIdSynopsisMatch[2]),
-                  asBugIdMatch = sBugIdSynopsisHTML && sBugIdSynopsisHTML.match(rBugId),
-                  sBugId = asBugIdMatch && (asBugIdMatch[1] || asBugIdMatch[2]),
-                  asBugLocationMatch = sBugIdSynopsisHTML && sBugIdSynopsisHTML.match(rBugLocation),
-                  sBugLocation = asBugLocationMatch && (asBugLocationMatch[1] || asBugLocationMatch[2]);
-              if (!sBugIdSynopsisHTML) {
-                bErrorReported = true;
-                return fCallback(new Error("BugId report synopsis does not appear to have a known format in " + sSectionFilePath));
               };
-              if (!sBugId) {
-                bErrorReported = true;
-                return fCallback(new Error("BugId report id does not appear to have a known format in " + sSectionFilePath));
-              };
-              if (!sBugLocation) {
-                bErrorReported = true;
-                return fCallback(new Error("BugId report location does not appear to have a known format in " + sSectionFilePath));
-              };
-              oArticle.aoSections[uIndex] = {
-                "sType": "BugId report",
-                "sName": sBugId + " @ " + sBugLocation,
-                "sContentHTML": sBugIdSynopsisHTML.replace(rBugIdSynopsisStrip, ""),
-                "sAttachmentFileName": dxSection.sAttachmentFileName || dxSection.sFileName,
-                "sAttachmentData": sBugIdReportHTML,
-              };
+              oArticle.aoSections[uIndex] = oSection;
               if (++uSectionFilesRead == dxArticle.adxSections.length) return fCallback(null, oArticle);
             });
           default:

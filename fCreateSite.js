@@ -5,12 +5,12 @@ var mPath = require("path"),
     fCreateMainPage = require("./fCreateMainPage"),
     fCreateRSSFeed = require("./fCreateRSSFeed");
 
-function fCreateSite(oSite, dsTemplate_by_sName, fCallback) {
-  fCreateArticles(oSite, dsTemplate_by_sName, function (oError) {
+function fCreateSite(oSite, dsTemplate_by_sFileName, fCallback) {
+  fCreateArticles(oSite, dsTemplate_by_sFileName, function (oError) {
     if (oError) fCallback(oError);
-    fCreateMainPage(oSite, dsTemplate_by_sName, function (oError) {
+    fCreateMainPage(oSite, dsTemplate_by_sFileName, function (oError) {
       if (oError) fCallback(oError);
-      fCreateRSSFeed(oSite, dsTemplate_by_sName, fCallback);
+      fCreateRSSFeed(oSite, dsTemplate_by_sFileName, fCallback);
     });
   });
 };
