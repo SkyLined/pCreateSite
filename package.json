@@ -2,7 +2,7 @@
   "name": "blog",
   "description": "Program to generate a set of HTML files from a set of Markdown files to create a blog",
   "keywords": [
-    "Blog",
+    "Blog"
   ],
   "version": "0.0.1",
   "author": {
@@ -11,15 +11,15 @@
     "url": "https://github.com/SkyLined"
   },
   "bugs": {
-    "url": "https://github.com/SkyLined/Blog/issues"
+    "url": "https://github.com/SkyLined/pCreateSite/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/SkyLined/Blog"
+    "url": "git://github.com/SkyLined/pCreateSite"
   },
   "dependencies": {
-    "marked": "0.3.5",
-    "highlight.js": "9.2.0",
+    "marked": "^0.3.5",
+    "highlight.js": "^9.2.0"
   },
   "main": "./pCreateSite.js",
   "engines": {
