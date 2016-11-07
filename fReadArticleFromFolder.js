@@ -14,11 +14,13 @@ var mPath = require("path"),
 var rArticleFolderNameSequenceNumber = /^((\d{4})\-(\d{2})\-(\d{2}))(?:\#(\d+))?\s/i,
     rArticleTitleSynopsis = /^\s*<h\d(?:\s+[^>]*)>(.+?)<\/h\d>\s+([\s\S]+?)\s*$/i,
     dsLanguage_by_sSourceFileExtention = {
+      ".asp":     "VBScript-HTML",
       ".html":    "HTML",
-      ".xhtml":   "HTML",
-      ".svg":     "SVG",
       ".js":      "Javascript",
       ".py":      "Python",
+      ".svg":     "SVG",
+      ".vbs":     "VBScript",
+      ".xhtml":   "HTML",
     };
 
 function fReadArticleFromFolder(sBaseFolderPath, sArticleFolderName, fCallback) {
