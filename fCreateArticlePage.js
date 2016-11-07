@@ -1,6 +1,7 @@
 module.exports = fCreateArticlePage;
 var fsHTMLEncodeEntities = require("./fsHTMLEncodeEntities"),
-    fWriteFile = require("./fWriteFile");
+    fWriteFile = require("./fWriteFile"),
+    fsCreateIconImagesHTML = require("./fsCreateIconImagesHTML");
 
 function fCreateArticlePage(oArticle, dsTemplate_by_sFileName, fCallback) {
   var asSectionsHTML = oArticle.aoSections.map(function (oSection) {
@@ -20,6 +21,7 @@ function fCreateArticlePage(oArticle, dsTemplate_by_sFileName, fCallback) {
         return sSectionHTML;
       });
       sPageContentHTML = dsTemplate_by_sFileName["Article.html"]
+          .replace(/<<sArticleIconsHTML>>/g, fsCreateIconImagesHTML(oArticle.asIcons))
           .replace(/<<sArticleSectionsHTML>>/g, asSectionsHTML.join("")),
       sPageHTML = dsTemplate_by_sFileName["Page.html"]
           .replace(/<<sTitle>>/g, fsHTMLEncodeEntities(oArticle.sTitle))

@@ -1,12 +1,7 @@
 module.exports = fCreateMainPage;
 var fsHTMLEncodeEntities = require("./fsHTMLEncodeEntities"),
-    fWriteFile = require("./fWriteFile");
-
-function fsCreateIconImagesHTML(asIcons) {
-   return asIcons.map(function (sIcon) {
-      return "<img class=\"icon\" src=\"/Images/" + fsHTMLEncodeEntities(sIcon) + "\"/>";
-  }).join("");
-}
+    fWriteFile = require("./fWriteFile"),
+    fsCreateIconImagesHTML = require("./fsCreateIconImagesHTML");
 
 function fCreateMainPage(oSite, dsTemplate_by_sFileName, fCallback) {
   var dsArticlesHTML_by_uSequenceNumber = {},
