@@ -3,10 +3,11 @@ var mPath = require("path"),
     fReadJSONFile = require("./fReadJSONFile"),
     fReadTemplatesFromFolder = require("./fReadTemplatesFromFolder"),
     fReadArticlesFromFolder = require("./fReadArticlesFromFolder"),
-    fCreateSite = require("./fCreateSite"),
-    sInputFolderPath,
-    sOutputFolderPath;
+    fCreateArticles = require("./fCreateArticles"),
+    fCreateMainPage = require("./fCreateMainPage"),
+    fCreateRSSFeed = require("./fCreateRSSFeed");
 
+var sInputFolderPath, sOutputFolderPath;
 process.argv.forEach(function (sArgument) {
   if (sArgument.toLowerCase().substr(0, 8) == "--input=") {
     sInputFolderPath = mPath.join(sArgument.substr(8));
@@ -50,11 +51,17 @@ if (!sInputFolderPath || !sOutputFolderPath) {
           oArticle.sAttachmentsAbsoluteBaseURL = sAbsoluteBaseURL + encodeURIComponent(sArticleID) + "/";
           oArticle.sAttachmentsRelativeBaseURL = sRelativeBaseURL + encodeURIComponent(sArticleID) + "/";
         });
-        fCreateSite(oSite, dsTemplate_by_sFileName, function (oError) {
-          if (oError) throw oError;
-          fCopyFolder(sStaticFolderPath, sOutputFolderPath, function (oError) {
-            if (oError) throw oError;
-            console.log("Site created");
+        fCreateArticles(oSite, dsTemplate_by_sFileName, function (oError) {
+          if (oError) fCallback(oError);
+          fCreateMainPage(oSite, dsTemplate_by_sFileName, function (oError) {
+            if (oError) fCallback(oError);
+            fCreateRSSFeed(oSite, dsTemplate_by_sFileName, function (oError) {
+              if (oError) throw oError;
+              fCopyFolder(sStaticFolderPath, sOutputFolderPath, function (oError) {
+                if (oError) throw oError;
+                console.log("Site created");
+              });
+            });
           });
         });
       });
