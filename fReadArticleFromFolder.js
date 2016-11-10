@@ -16,6 +16,7 @@ var rArticleFolderNameSequenceNumber = /^((\d{4})\-(\d{2})\-(\d{2}))(?:\#(\d+))?
     dsLanguage_by_sSourceFileExtention = {
       ".asp":     "VBScript-HTML",
       ".html":    "HTML",
+      ".http":    "HTTP",
       ".js":      "Javascript",
       ".py":      "Python",
       ".svg":     "SVG",
@@ -43,7 +44,7 @@ function fReadArticleFromFolder(sBaseFolderPath, sArticleFolderName, fCallback) 
         "sTitle": void 0,
         "sSummary": void 0,
         "sSynopsisHTML": void 0,
-        "asIcons": [],
+        "asTags": [],
         "aoSections": [],
       };
   var sArticleJSONFilePath = mPath.join(sArticleFolderPath, "dxArticle.json");
@@ -52,7 +53,7 @@ function fReadArticleFromFolder(sBaseFolderPath, sArticleFolderName, fCallback) 
     // dxArticle
     if (typeof dxArticle != "object") return fCallback(new Error("dxArticle is not an object in " + sArticleJSONFilePath));
     for (sSetting in dxArticle) {
-      if (!(sSetting in {"sTitle":0, "sSummary":0, "asIcons":0, "sSynopsisFileName":0, "adxSections":0})) {
+      if (!(sSetting in {"sTitle":0, "sSummary":0, "asTags":0, "sSynopsisFileName":0, "adxSections":0})) {
         return fCallback(new Error("dxArticle." + sSetting + " is not a known article setting in " + sArticleJSONFilePath));
       };
     };
@@ -62,17 +63,17 @@ function fReadArticleFromFolder(sBaseFolderPath, sArticleFolderName, fCallback) 
     // dxArticle.sSummary
     if (typeof dxArticle.sSummary != "string") return fCallback(new Error("dxArticle.sSummary is not a string in " + sArticleJSONFilePath));
     oArticle.sSummary = dxArticle.sSummary;
-    // dxArticle.asIcons
-    if (!(dxArticle.asIcons instanceof Array)) return fCallback(new Error("dxArticle.asIcons is not an array in " + sArticleJSONFilePath));
+    // dxArticle.asTags
+    if (!(dxArticle.asTags instanceof Array)) return fCallback(new Error("dxArticle.asTags is not an array in " + sArticleJSONFilePath));
     var bErrorReported = false;
-    dxArticle.asIcons.forEach(function (sIcon, uIndex) {
+    dxArticle.asTags.forEach(function (sIcon, uIndex) {
       if (typeof sIcon != "string") {
         bErrorReported = true;
-        return fCallback(new Error("dxArticle.asIcons[" + uIndex + "] is not a string in " + sArticleJSONFilePath));
+        return fCallback(new Error("dxArticle.asTags[" + uIndex + "] is not a string in " + sArticleJSONFilePath));
       };
     });
     if (bErrorReported) return;
-    oArticle.asIcons = dxArticle.asIcons;
+    oArticle.asTags = dxArticle.asTags;
     // dxArticle.sSynopsisFileName
     if (typeof dxArticle.sSynopsisFileName != "string") return fCallback(new Error("dxArticle.sSynopsisFileName is not a string in " + sArticleJSONFilePath));
     var sSynopsisFilePath = mPath.join(sArticleFolderPath, dxArticle.sSynopsisFileName);

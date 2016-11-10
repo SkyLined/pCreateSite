@@ -1,7 +1,7 @@
 module.exports = fCreateMainPage;
 var fsHTMLEncodeEntities = require("./fsHTMLEncodeEntities"),
     fWriteFile = require("./fWriteFile"),
-    fsCreateIconImagesHTML = require("./fsCreateIconImagesHTML");
+    fsCreateTagIconsHTML = require("./fsCreateTagIconsHTML"),
 
 function fCreateMainPage(oSite, dsTemplate_by_sFileName, fCallback) {
   var dsArticlesHTML_by_uSequenceNumber = {},
@@ -10,7 +10,7 @@ function fCreateMainPage(oSite, dsTemplate_by_sFileName, fCallback) {
     if (oArticle.uSequenceNumber in dsArticlesHTML_by_uSequenceNumber)
         throw new Error("Two articles with sequence number " + oArticle.uSequenceNumber);
     var sArticleHTML = dsTemplate_by_sFileName["Main page article.html"]
-        .replace(/<<sArticleIconsHTML>>/g, fsCreateIconImagesHTML(oArticle.asIcons))
+        .replace(/<<sArticleTagIconsHTML>>/g, fsCreateTagIconsHTML(oArticle.asTags))
         .replace(/<<sArticleTitle>>/g, fsHTMLEncodeEntities(oArticle.sTitle))
         .replace(/<<sArticleSynopsisHTML>>/g, oArticle.sSynopsisHTML)
         .replace(/<<sArticleDate>>/g, fsHTMLEncodeEntities(oArticle.sDate))
