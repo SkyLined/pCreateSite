@@ -21,20 +21,20 @@ var dxMarkedOptions = { // See https://github.com/chjj/marked for details.
       "smartLists": true,   // Enable "smarter" lists than the original Markdown standard
       "smartypants": false, // Enable "smarter" typograhic punctuation (quotes, dashes).
     };
-dxMarkedOptions["renderer"] = new mMarked.Renderer(dxMarkedOptions);
+dxMarkedOptions.renderer = new mMarked.Renderer(dxMarkedOptions);
 var oMarkedLexer = new mMarked.Lexer(dxMarkedOptions);
 
 function fReadMarkdownFileAsHTML(sFilePath, fCallback) {
   fReadFile(sFilePath, function (oError, sData) {
     if (oError) return fCallback(oError);
     try {
-      var aoDataMarkerTokens = oMarkedLexer.lex(sData);
+      var aoDataMarkedTokens = oMarkedLexer.lex(sData);
     } catch (oError) {
       oError.message += " while lexing " + sFilePath;
       fCallback(oError);
     };
     try {
-      var sDataHTML = mMarked.parser(aoDataMarkerTokens, dxMarkedOptions);
+      var sDataHTML = mMarked.parser(aoDataMarkedTokens, dxMarkedOptions);
     } catch (oError) {
       oError.message += " while parsing " + sFilePath;
       fCallback(oError);
