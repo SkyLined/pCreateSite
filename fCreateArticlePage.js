@@ -2,6 +2,7 @@ module.exports = fCreateArticlePage;
 var fsHTMLEncodeEntities = require("./fsHTMLEncodeEntities"),
     fWriteFile = require("./fWriteFile"),
     fsCreateTagIconsHTML = require("./fsCreateTagIconsHTML"),
+    fsInsertLineAndWordBreaksInHTML = require("./fsInsertLineAndWordBreaksInHTML");
 
 function fCreateArticlePage(oArticle, dsTemplate_by_sFileName, fCallback) {
   var asSectionsHTML = oArticle.aoSections.map(function (oSection) {
@@ -31,5 +32,5 @@ function fCreateArticlePage(oArticle, dsTemplate_by_sFileName, fCallback) {
   var asFailedSubstitution = sPageHTML.match(/<<.*?>>/);
   if (asFailedSubstitution)
       throw new Error("The substition failed for " + asFailedSubstitution[0] + " in an article page.");
-  fWriteFile(oArticle.sPageHTMLFilePath, sPageHTML, fCallback);
+  fWriteFile(oArticle.sPageHTMLFilePath, fsInsertLineAndWordBreaksInHTML(sPageHTML), fCallback);
 };

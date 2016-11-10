@@ -2,6 +2,7 @@ module.exports = fCreateMainPage;
 var fsHTMLEncodeEntities = require("./fsHTMLEncodeEntities"),
     fWriteFile = require("./fWriteFile"),
     fsCreateTagIconsHTML = require("./fsCreateTagIconsHTML"),
+    fsInsertLineAndWordBreaksInHTML = require("./fsInsertLineAndWordBreaksInHTML");
 
 function fCreateMainPage(oSite, dsTemplate_by_sFileName, fCallback) {
   var dsArticlesHTML_by_uSequenceNumber = {},
@@ -33,5 +34,5 @@ function fCreateMainPage(oSite, dsTemplate_by_sFileName, fCallback) {
   var asFailedSubstitution = sPageHTML.match(/<<.*?>>/);
   if (asFailedSubstitution)
       throw new Error("The substition failed for " + asFailedSubstitution[0] + " in the main page.");
-  fWriteFile(oSite.sMainPageHTMLFilePath, sPageHTML, fCallback);
+  fWriteFile(oSite.sMainPageHTMLFilePath, fsInsertLineAndWordBreaksInHTML(sPageHTML), fCallback);
 };
