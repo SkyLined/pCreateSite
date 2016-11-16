@@ -22,7 +22,7 @@ function fCreateRSSFeed(oSite, dsTemplate_by_sFileName, fCallback) {
     return dsArticleItemXML_by_uSequenceNumber[uSequenceNumber];
   });
   var sRSSFeedXML = dsTemplate_by_sFileName["RSS feed.xml"]
-          .replace(/<<sSiteTitle>>/g, fsXMLEncodeEntities(oSite.sTitle))
+          .replace(/<<sSiteTitle>>/g, fsXMLEncodeEntities(oSite.sName))
           .replace(/<<sSiteSummary>>/g, fsXMLEncodeEntities(oSite.sSummary))
           .replace(/<<sSiteAbsoluteURL>>/g, fsXMLEncodeEntities(oSite.sMainPageAbsoluteURL))
           .replace(/<<sArticlesXML>>/g, asArticleItemXML.join("\r\n"));

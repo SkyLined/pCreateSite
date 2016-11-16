@@ -5,7 +5,8 @@ var fsHTMLEncodeEntities = require("./fsHTMLEncodeEntities"),
     fsInsertLineAndWordBreaksInHTML = require("./fsInsertLineAndWordBreaksInHTML");
 
 function fCreateArticlePage(oArticle, dsTemplate_by_sFileName, fCallback) {
-  var asSectionsHTML = oArticle.aoSections.map(function (oSection) {
+  var oSite = oArticle.oSite,
+      asSectionsHTML = oArticle.aoSections.map(function (oSection) {
         var sSectionHTML = dsTemplate_by_sFileName["Article section " + oSection.sType + ".html"];
         if (!sSectionHTML)
             return fCallback(new Error("No article section template found for section type " + JSON.stringify(oSection.sType)));
@@ -24,10 +25,23 @@ function fCreateArticlePage(oArticle, dsTemplate_by_sFileName, fCallback) {
       sPageContentHTML = dsTemplate_by_sFileName["Article.html"]
           .replace(/<<sArticleTagIconsHTML>>/g, fsCreateTagIconsHTML(oArticle.asTags))
           .replace(/<<sArticleSectionsHTML>>/g, asSectionsHTML.join("")),
+      sBannerImageRelativeURL = oSite.asBannerImageRelativeURLs[Math.floor(Math.random() * oSite.asBannerImageRelativeURLs.length)],
       sPageHTML = dsTemplate_by_sFileName["Page.html"]
-          .replace(/<<sTitle>>/g, fsHTMLEncodeEntities(oArticle.sTitle))
+          .replace(/<<sSiteCopyrightYear>>/g, fsHTMLEncodeEntities(oSite.sSiteCopyrightYear))
+          .replace(/<<sSitelastUpdatedDate>>/g, fsHTMLEncodeEntities(oSite.sSitelastUpdatedDate))
+          .replace(/<<sSiteName>>/g, fsHTMLEncodeEntities(oSite.sName))
+          .replace(/<<sPageTitle>>/g, fsHTMLEncodeEntities(oArticle.sTitle))
+          .replace(/<<sAuthorName>>/g, fsHTMLEncodeEntities(oSite.oAuthor.sName))
+          .replace(/<<sAuthorTwitterHandle>>/g, fsHTMLEncodeEntities(oSite.oAuthor.sTwitterHandle))
+          .replace(/<<sAuthorGitHubHandle>>/g, fsHTMLEncodeEntities(oSite.oAuthor.sGitHubHandle))
+          .replace(/<<sAuthorEmailAddress>>/g, fsHTMLEncodeEntities(oSite.oAuthor.sEmailAddress))
+          .replace(/<<sLicenseDescription>>/g, fsHTMLEncodeEntities(oSite.oLicense.sDescription))
+          .replace(/<<sLicenseImageRelativeURL>>/g, fsHTMLEncodeEntities(oSite.oLicense.sImageRelativeURL))
+          .replace(/<<sLicenseDetailsAbsoluteURL>>/g, fsHTMLEncodeEntities(oSite.oLicense.sDetailsAbsoluteURL))
           .replace(/<<sSummary>>/g, fsHTMLEncodeEntities(oArticle.sSummary))
-          .replace(/<<sAbsoluteSiteURL>>/g, fsHTMLEncodeEntities(oArticle.oSite.sAbsoluteURL))
+          .replace(/<<sSiteAbsoluteURL>>/g, fsHTMLEncodeEntities(oArticle.oSite.sAbsoluteURL))
+          .replace(/<<sBannerImageRelativeURL>>/g, fsHTMLEncodeEntities(sBannerImageRelativeURL))
+          .replace(/<<sPageAvatarRelativeURL>>/g, fsHTMLEncodeEntities(oSite.sSiteAvatarRelativeURL))
           .replace(/<<sPageContentHTML>>/g, sPageContentHTML);
   var asFailedSubstitution = sPageHTML.match(/<<.*?>>/);
   if (asFailedSubstitution)

@@ -11,10 +11,13 @@ var mPath = require("path"),
 // is the day, and "I" is an index (optional, defaults to 1, useful if you have more than one post in one day).
 // A sequence number is generated from this information and used to create a unique file name for, and thus a link to,
 // the article.
+// https://github.com/isagalaev/highlight.js/tree/master/src/languages
 var rArticleFolderNameSequenceNumber = /^((\d{4})\-(\d{2})\-(\d{2}))(?:\#(\d+))?\s/i,
     rArticleTitleSynopsis = /^\s*<h\d(?:\s+[^>]*)>(.+?)<\/h\d>\s+([\s\S]+?)\s*$/i,
     dsLanguage_by_sSourceFileExtention = {
+      ".asm":     "x86asm",
       ".asp":     "VBScript-HTML",
+      ".cpp":     "CPP",
       ".html":    "HTML",
       ".http":    "HTTP",
       ".js":      "Javascript",
@@ -105,10 +108,16 @@ function fReadArticleFromFolder(sBaseFolderPath, sArticleFolderName, fCallback) 
           bErrorReported = true;
           return fCallback(new Error("dxArticle.adxSections[" + uIndex + "].sFileName is not a string in " + sArticleJSONFilePath));
         };
+        var sName = dxSection.sFileName,
+            sAttachmentFileName = dxSection.sFileName;
         // dxSection.sAttachmentFileName
-        if ("sAttachmentFileName" in dxSection && typeof dxSection.sAttachmentFileName != "string") {
-          bErrorReported = true;
-          return fCallback(new Error("dxArticle.adxSections[" + uIndex + "].sAttachmentFileName is not a string in " + sArticleJSONFilePath));
+        if ("sAttachmentFileName" in dxSection) {
+          if (typeof dxSection.sAttachmentFileName == "string") {
+            sName = sAttachmentFileName = dxSection.sAttachmentFileName;
+          } else {
+            bErrorReported = true;
+            return fCallback(new Error("dxArticle.adxSections[" + uIndex + "].sAttachmentFileName is not a string or null in " + sArticleJSONFilePath));
+          };
         };
         var sSectionFilePath = mPath.join(sArticleFolderPath, dxSection.sFileName),
             sSectionFileExtention = mPath.extname(dxSection.sFileName);
@@ -127,6 +136,7 @@ function fReadArticleFromFolder(sBaseFolderPath, sArticleFolderName, fCallback) 
               if (++uSectionFilesRead == dxArticle.adxSections.length) return fCallback(null, oArticle);
             });
           case "Source code":
+          case "Source code snippet": // Almost the same as "Source code", but cannot be downloaded.
             var sLanguage = dsLanguage_by_sSourceFileExtention[sSectionFileExtention];
             if (!sLanguage) {
               bErrorReported = true;
@@ -144,12 +154,15 @@ function fReadArticleFromFolder(sBaseFolderPath, sArticleFolderName, fCallback) 
                 bErrorReported = true;
                 return fCallback(oError);
               };
-              oArticle.aoSections[uIndex] = {
+              oArticle.aoSections[uIndex] = dxSection.sType == "Source code" ? {
                 "sType": "source code",
-                "sName": dxSection.sAttachmentFileName || dxSection.sFileName,
+                "sName": sName,
                 "sContentHTML": sSourceCodeHTML,
-                "sAttachmentFileName": dxSection.sAttachmentFileName || dxSection.sFileName,
+                "sAttachmentFileName": sAttachmentFileName,
                 "sAttachmentData": sSourceCode,
+              } : {
+                "sType": "source code snippet",
+                "sContentHTML": sSourceCodeHTML,
               };
               if (++uSectionFilesRead == dxArticle.adxSections.length) return fCallback(null, oArticle);
             });
