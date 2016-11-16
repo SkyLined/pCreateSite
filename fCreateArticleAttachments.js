@@ -4,7 +4,11 @@ var mPath = require("path"),
     fWriteFile = require("./fWriteFile");
 
 function fCreateArticleAttachments(oArticle, fCallback) {
-  var aoAttachmentSections = oArticle.aoSections.filter(function (oSection) { return oSection.sAttachmentData; });
+  // Save all attachments that can be downloaded to files.
+  var aoAttachmentSections = oArticle.aoSections.filter(function (oSection) {
+    // Select attachments; these have data.
+    return oSection.sAttachmentData;
+  });
   if (aoAttachmentSections.length == 0) return fCallback();
   fCreateFolderIfNotExists(oArticle.sAttachmentsFolderPath, function (oError) {
     if (oError) return fCallback(oError);
