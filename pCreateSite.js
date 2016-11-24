@@ -41,6 +41,7 @@ if (!sInputFolderPath || !sOutputFolderPath) {
                 "sTwitterHandle": dxSite["dxAuthor"]["sTwitterHandle"],
                 "sGitHubHandle": dxSite["dxAuthor"]["sGitHubHandle"],
                 "sEmailAddress": dxSite["dxAuthor"]["sEmailAddress"],
+                "sBitcoin": dxSite["dxAuthor"]["sBitcoin"],
               },
               "sAuthorTwitterHandle": dxSite["sAuthorTwitterHandle"],
               "oLicense": {
