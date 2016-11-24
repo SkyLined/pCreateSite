@@ -23,6 +23,7 @@ var rArticleFolderNameSequenceNumber = /^((\d{4})\-(\d{2})\-(\d{2}))(?:\#(\d+))?
       ".js":      "Javascript",
       ".py":      "Python",
       ".svg":     "SVG",
+      ".txt":     null,
       ".vbs":     "VBScript",
       ".xhtml":   "HTML",
     };
@@ -137,22 +138,26 @@ function fReadArticleFromFolder(sBaseFolderPath, sArticleFolderName, fCallback) 
             });
           case "Source code":
           case "Source code snippet": // Almost the same as "Source code", but cannot be downloaded.
-            var sLanguage = dsLanguage_by_sSourceFileExtention[sSectionFileExtention];
-            if (!sLanguage) {
+            if (!(sSectionFileExtention in dsLanguage_by_sSourceFileExtention)) {
               bErrorReported = true;
               return fCallback(new Error("dxArticle.adxSections[" + uIndex + "].sFileName has an unknown extention (" + sSectionFileExtention + ") in " + sArticleJSONFilePath));
             };
+            var sLanguage = dsLanguage_by_sSourceFileExtention[sSectionFileExtention];
             return fReadFile(sSectionFilePath, function (oError, sSourceCode) {
               if (bErrorReported) return;
               if (oError) {
                 bErrorReported = true;
                 return fCallback(oError);
               };
-              try {
-                sSourceCodeHTML = mHighlight.highlight(sLanguage, sSourceCode, false).value;
-              } catch (oError) {
-                bErrorReported = true;
-                return fCallback(oError);
+              if (sLanguage) {
+                try {
+                  sSourceCodeHTML = mHighlight.highlight(sLanguage, sSourceCode, false).value;
+                } catch (oError) {
+                  bErrorReported = true;
+                  return fCallback(oError);
+                };
+              } else {
+                sSourceCodeHTML = sSourceCode;
               };
               oArticle.aoSections[uIndex] = dxSection.sType == "Source code" ? {
                 "sType": "source code",
