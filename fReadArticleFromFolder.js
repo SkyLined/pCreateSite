@@ -22,7 +22,7 @@ var rArticleFolderNameSequenceNumber = /^((\d{4})\-(\d{2})\-(\d{2}))(?:\#(\d+))?
       ".http":    "HTTP",
       ".js":      "Javascript",
       ".py":      "Python",
-      ".svg":     "SVG",
+      ".svg":     "HTML",
       ".txt":     null,
       ".vbs":     "VBScript",
       ".xhtml":   "HTML",
