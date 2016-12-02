@@ -31,13 +31,13 @@ function fReadMarkdownFileAsHTML(sFilePath, fCallback) {
       var aoDataMarkedTokens = oMarkedLexer.lex(sData);
     } catch (oError) {
       oError.message += " while lexing " + sFilePath;
-      fCallback(oError);
+      return fCallback(oError);
     };
     try {
       var sDataHTML = mMarked.parser(aoDataMarkedTokens, dxMarkedOptions);
     } catch (oError) {
       oError.message += " while parsing " + sFilePath;
-      fCallback(oError);
+      return fCallback(oError);
     };
     var asMissingLink = sDataHTML.match(/\[.*?\]\[\]/);
     if (asMissingLink)

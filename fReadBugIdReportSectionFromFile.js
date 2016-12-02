@@ -34,7 +34,13 @@ function fReadBugIdReportSectionFromFile(sSectionFilePath, dxSection, fCallback)
         return fCallback(new Error("BugId report location does not appear to have a known format in " + sSectionFilePath));
       };
       sType = "BugId report";
-      sName = sBugId + " @ " + sBugLocation;
+      if (sBugId.match(/\.(exe|dll)!/)) {
+        // Originally BugId's had the topmost relevant function name in the ID, which means it can be used as the name
+        sName = sBugId;
+      } else {
+        // Newer BugId's only have the hash, so we add the location for readability:
+        sName = sBugId + " @ " + sBugLocation;
+      };
       sBugIdSynopsisHTML = sBugIdSynopsisHTML.replace(rBugIdSynopsisStrip, "")
     } else if (asOldBugIdSynopsisMatch1) {
       var sBugIdSynopsisHTML = asOldBugIdSynopsisMatch1[1],
@@ -59,7 +65,7 @@ function fReadBugIdReportSectionFromFile(sSectionFilePath, dxSection, fCallback)
     };
     return fCallback(null, {
       "sType": sType,
-      "sName": sName,
+      "sName": "BugId report: " + sName,
       "sContentHTML": sBugIdSynopsisHTML,
       "sAttachmentFileName": dxSection.sAttachmentFileName || dxSection.sFileName,
       "sAttachmentData": sBugIdReportHTML,

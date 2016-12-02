@@ -1,11 +1,10 @@
 module.exports = fReadArticleFromFolder;
 var mPath = require("path"),
-    fReadFile = require("./fReadFile"),
     fReadFileAsHTML = require("./fReadFileAsHTML"),
-    fsHTMLDecodeEntities = require("./fsHTMLDecodeEntities"),
     fReadJSONFile = require("./fReadJSONFile"),
-    mHighlight = require("highlight.js"),
-    fReadBugIdReportSectionFromFile = require("./fReadBugIdReportSectionFromFile");
+    fReadTextSectionFromFile = require("./fReadTextSectionFromFile"),
+    fReadBugIdReportSectionFromFile = require("./fReadBugIdReportSectionFromFile"),
+    fReadSourceCodeSectionFromFile = require("./fReadSourceCodeSectionFromFile");
 
 // Each article folder should follow the format "YYYY-MM-DD#I ...", where "YYYY" is the year, "MM" is the month, "DD"
 // is the day, and "I" is an index (optional, defaults to 1, useful if you have more than one post in one day).
@@ -14,20 +13,12 @@ var mPath = require("path"),
 // https://github.com/isagalaev/highlight.js/tree/master/src/languages
 var rArticleFolderNameSequenceNumber = /^((\d{4})\-(\d{2})\-(\d{2}))(?:\#(\d+))?\s/i,
     rArticleTitleSynopsis = /^\s*<h\d(?:\s+[^>]*)>(.+?)<\/h\d>\s+([\s\S]+?)\s*$/i,
-    dsLanguage_by_sSourceFileExtention = {
-      ".asm":     "x86asm",
-      ".asp":     "VBScript-HTML",
-      ".cpp":     "CPP",
-      ".html":    "HTML",
-      ".http":    "HTTP",
-      ".js":      "Javascript",
-      ".py":      "Python",
-      ".svg":     "HTML",
-      ".txt":     null,
-      ".vbs":     "VBScript",
-      ".xhtml":   "HTML",
+    dSection_fReadFromFile_by_sType = {
+      "Text": fReadTextSectionFromFile,
+      "Source code": fReadSourceCodeSectionFromFile,
+      "Source code snippet": fReadSourceCodeSectionFromFile,
+      "BugId report": fReadBugIdReportSectionFromFile,
     };
-
 function fReadArticleFromFolder(sBaseFolderPath, sArticleFolderName, fCallback) {
   var sArticleFolderPath = mPath.join(sBaseFolderPath, sArticleFolderName),
       asSequenceNumberComponents = sArticleFolderName.match(rArticleFolderNameSequenceNumber);
@@ -109,82 +100,22 @@ function fReadArticleFromFolder(sBaseFolderPath, sArticleFolderName, fCallback) 
           bErrorReported = true;
           return fCallback(new Error("dxArticle.adxSections[" + uIndex + "].sFileName is not a string in " + sArticleJSONFilePath));
         };
-        var sName = dxSection.sFileName,
-            sAttachmentFileName = dxSection.sFileName;
-        // dxSection.sAttachmentFileName
-        if ("sAttachmentFileName" in dxSection) {
-          if (typeof dxSection.sAttachmentFileName == "string") {
-            sName = sAttachmentFileName = dxSection.sAttachmentFileName;
-          } else {
+        // Read the section file as the right type
+        var sSectionFilePath = mPath.join(sArticleFolderPath, dxSection.sFileName);
+        if (!(dxSection.sType in dSection_fReadFromFile_by_sType)) {
+          bErrorReported = true;
+          return fCallback(new Error("dxArticle.adxSections[" + uIndex + "].sType (" + dxSection.sType + ") is not a known type in " + sArticleJSONFilePath));
+        };
+        var fReadSectionFromFile = dSection_fReadFromFile_by_sType[dxSection.sType];
+        fReadSectionFromFile(sSectionFilePath, dxSection, function (oError, oSection) {
+          if (bErrorReported) return;
+          if (oError) {
             bErrorReported = true;
-            return fCallback(new Error("dxArticle.adxSections[" + uIndex + "].sAttachmentFileName is not a string or null in " + sArticleJSONFilePath));
+            return fCallback(oError);
           };
-        };
-        var sSectionFilePath = mPath.join(sArticleFolderPath, dxSection.sFileName),
-            sSectionFileExtention = mPath.extname(dxSection.sFileName);
-        switch (dxSection.sType) {
-          case "Text":
-            return fReadFileAsHTML(sSectionFilePath, function (oError, sContentHTML) {
-              if (bErrorReported) return;
-              if (oError) {
-                bErrorReported = true;
-                return fCallback(oError);
-              }
-              oArticle.aoSections[uIndex] = {
-                "sType": "text",
-                "sContentHTML": sContentHTML
-              };
-              if (++uSectionFilesRead == dxArticle.adxSections.length) return fCallback(null, oArticle);
-            });
-          case "Source code":
-          case "Source code snippet": // Almost the same as "Source code", but cannot be downloaded.
-            if (!(sSectionFileExtention in dsLanguage_by_sSourceFileExtention)) {
-              bErrorReported = true;
-              return fCallback(new Error("dxArticle.adxSections[" + uIndex + "].sFileName has an unknown extention (" + sSectionFileExtention + ") in " + sArticleJSONFilePath));
-            };
-            var sLanguage = dsLanguage_by_sSourceFileExtention[sSectionFileExtention];
-            return fReadFile(sSectionFilePath, function (oError, sSourceCode) {
-              if (bErrorReported) return;
-              if (oError) {
-                bErrorReported = true;
-                return fCallback(oError);
-              };
-              if (sLanguage) {
-                try {
-                  sSourceCodeHTML = mHighlight.highlight(sLanguage, sSourceCode, false).value;
-                } catch (oError) {
-                  bErrorReported = true;
-                  return fCallback(oError);
-                };
-              } else {
-                sSourceCodeHTML = sSourceCode;
-              };
-              oArticle.aoSections[uIndex] = dxSection.sType == "Source code" ? {
-                "sType": "source code",
-                "sName": sName,
-                "sContentHTML": sSourceCodeHTML,
-                "sAttachmentFileName": sAttachmentFileName,
-                "sAttachmentData": sSourceCode,
-              } : {
-                "sType": "source code snippet",
-                "sContentHTML": sSourceCodeHTML,
-              };
-              if (++uSectionFilesRead == dxArticle.adxSections.length) return fCallback(null, oArticle);
-            });
-          case "BugId report":
-            return fReadBugIdReportSectionFromFile(sSectionFilePath, dxSection, function (oError, oSection) {
-              if (bErrorReported) return;
-              if (oError) {
-                bErrorReported = true;
-                return fCallback(oError);
-              };
-              oArticle.aoSections[uIndex] = oSection;
-              if (++uSectionFilesRead == dxArticle.adxSections.length) return fCallback(null, oArticle);
-            });
-          default:
-            bErrorReported = true;
-            return fCallback(new Error("dxArticle.adxSections[" + uIndex + "].sType (" + dxSection.sType + ") is not a known type in " + sArticleJSONFilePath));
-        };
+          oArticle.aoSections[uIndex] = oSection;
+          if (++uSectionFilesRead == dxArticle.adxSections.length) return fCallback(null, oArticle);
+        });
       });
     });
   });
