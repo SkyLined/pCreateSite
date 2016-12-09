@@ -56,7 +56,7 @@ if (!sInputFolderPath || !sOutputFolderPath) {
               "sMainPageAbsoluteURL": sAbsoluteBaseURL + "index.html",
               "sMainPageRelativeURL": sRelativeBaseURL + "index.html",
               "asBannerImageRelativeURLs": dxSite["asBannerImageRelativeURLs"],
-              "sSiteAvatarRelativeURL": dxSite["sSiteAvatarRelativeURL"],
+              "sTwitterAvatarRelativeURL": dxSite["sTwitterAvatarRelativeURL"],
               "aoArticles": aoArticles
             };
         aoArticles.forEach(function (oArticle) {

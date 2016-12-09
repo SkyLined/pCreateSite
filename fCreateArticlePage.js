@@ -43,7 +43,7 @@ function fCreateArticlePage(oArticle, dsTemplate_by_sFileName, fCallback) {
           .replace(/<<sBaseAbsoluteURL>>/g, fsHTMLEncodeEntities(oArticle.oSite.sBaseAbsoluteURL))
           .replace(/<<sMainPageRelativeURL>>/g, fsHTMLEncodeEntities(oArticle.oSite.sMainPageRelativeURL))
           .replace(/<<sBannerImageRelativeURL>>/g, fsHTMLEncodeEntities(sBannerImageRelativeURL))
-          .replace(/<<sPageAvatarRelativeURL>>/g, fsHTMLEncodeEntities(oSite.sSiteAvatarRelativeURL))
+          .replace(/<<sTwitterAvatarRelativeURL>>/g, fsHTMLEncodeEntities(oSite.sTwitterAvatarRelativeURL))
           .replace(/<<sPageContentHTML>>/g, sPageContentHTML);
   var asFailedSubstitution = sPageHTML.match(/<<.*?>>/);
   if (asFailedSubstitution)
