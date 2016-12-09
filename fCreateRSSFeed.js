@@ -1,5 +1,6 @@
 module.exports = fCreateRSSFeed;
-var fsXMLEncodeEntities = require("./fsXMLEncodeEntities"),
+var fsHTMLToText = require("./fsHTMLToText"),
+    fsXMLEncodeEntities = require("./fsXMLEncodeEntities"),
     fWriteFile = require("./fWriteFile");
 
 function fCreateRSSFeed(oSite, dsTemplate_by_sFileName, fCallback) {
@@ -11,6 +12,7 @@ function fCreateRSSFeed(oSite, dsTemplate_by_sFileName, fCallback) {
     var sArticleXML = dsTemplate_by_sFileName["RSS feed article.xml"]
             .replace(/<<sArticleTitle>>/g, fsXMLEncodeEntities(oArticle.sTitle))
             .replace(/<<sArticleDescription>>/g, fsXMLEncodeEntities(oArticle.sSynopsisHTML))
+            .replace(/<<sArticleDescriptionText>>/g, fsXMLEncodeEntities(fsHTMLToText(oArticle.sSynopsisHTML)))
             .replace(/<<sArticleAbsoluteURL>>/g, fsXMLEncodeEntities(oArticle.sPageAbsoluteURL))
             .replace(/<<sArticleDate>>/g, fsXMLEncodeEntities(oArticle.oDate.toString()));
     auSequenceNumbers.push(oArticle.uSequenceNumber);
