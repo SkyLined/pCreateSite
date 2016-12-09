@@ -25,8 +25,8 @@ if (!sInputFolderPath || !sOutputFolderPath) {
     var sTemplatesFolderPath = mPath.join(sInputFolderPath, dxSite["sTemplatesFolderPath"]),
         sArticlesFolderPath = mPath.join(sInputFolderPath, dxSite["sArticlesFolderPath"]),
         sStaticFolderPath = mPath.join(sInputFolderPath, dxSite["sStaticFolderPath"]),
-        sAbsoluteBaseURL = dxSite["sAbsoluteBaseURL"],
-        sRelativeBaseURL = dxSite["sRelativeBaseURL"];
+        sBaseAbsoluteURL = dxSite["sBaseAbsoluteURL"],
+        sBaseRelativeURL = dxSite["sBaseRelativeURL"];
     fReadTemplatesFromFolder(sTemplatesFolderPath, function (oError, dsTemplate_by_sFileName) {
       if (oError) throw oError;
       fReadArticlesFromFolder(sArticlesFolderPath, function (oError, aoArticles) {
@@ -52,9 +52,8 @@ if (!sInputFolderPath || !sOutputFolderPath) {
               "sSummary": dxSite["sSummary"],
               "sMainPageHTMLFilePath": mPath.join(sOutputFolderPath, "index.html"),
               "sRSSFeedXMLFilePath": mPath.join(sOutputFolderPath, "rss.xml"),
-              "sAbsoluteURL": sAbsoluteBaseURL,
-              "sMainPageAbsoluteURL": sAbsoluteBaseURL + "index.html",
-              "sMainPageRelativeURL": sRelativeBaseURL + "index.html",
+              "sBaseAbsoluteURL": sBaseAbsoluteURL,
+              "sMainPageRelativeURL": sBaseRelativeURL + "index.html",
               "asBannerImageRelativeURLs": dxSite["asBannerImageRelativeURLs"],
               "sTwitterAvatarRelativeURL": dxSite["sTwitterAvatarRelativeURL"],
               "aoArticles": aoArticles
