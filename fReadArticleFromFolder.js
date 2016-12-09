@@ -95,27 +95,35 @@ function fReadArticleFromFolder(sBaseFolderPath, sArticleFolderName, fCallback) 
           bErrorReported = true;
           return fCallback(new Error("dxArticle.adxSections[" + uIndex + "].sType is not a string in " + sArticleJSONFilePath));
         };
-        // dxSection.sFileName
-        if (typeof dxSection.sFileName != "string") {
-          bErrorReported = true;
-          return fCallback(new Error("dxArticle.adxSections[" + uIndex + "].sFileName is not a string in " + sArticleJSONFilePath));
-        };
-        // Read the section file as the right type
-        var sSectionFilePath = mPath.join(sArticleFolderPath, dxSection.sFileName);
-        if (!(dxSection.sType in dSection_fReadFromFile_by_sType)) {
-          bErrorReported = true;
-          return fCallback(new Error("dxArticle.adxSections[" + uIndex + "].sType (" + dxSection.sType + ") is not a known type in " + sArticleJSONFilePath));
-        };
-        var fReadSectionFromFile = dSection_fReadFromFile_by_sType[dxSection.sType];
-        fReadSectionFromFile(sSectionFilePath, dxSection, function (oError, oSection) {
-          if (bErrorReported) return;
-          if (oError) {
+        if (dxSection.sType == "Separator") {
+            oArticle.aoSections[uIndex] = {
+              "sType": "separator",
+              "sContentHTML": "",
+            };
+            if (++uSectionFilesRead == dxArticle.adxSections.length) return fCallback(null, oArticle);
+        } else {
+          // dxSection.sFileName
+          if (typeof dxSection.sFileName != "string") {
             bErrorReported = true;
-            return fCallback(oError);
+            return fCallback(new Error("dxArticle.adxSections[" + uIndex + "].sFileName is not a string in " + sArticleJSONFilePath));
           };
-          oArticle.aoSections[uIndex] = oSection;
-          if (++uSectionFilesRead == dxArticle.adxSections.length) return fCallback(null, oArticle);
-        });
+          // Read the section file as the right type
+          var sSectionFilePath = mPath.join(sArticleFolderPath, dxSection.sFileName);
+          if (!(dxSection.sType in dSection_fReadFromFile_by_sType)) {
+            bErrorReported = true;
+            return fCallback(new Error("dxArticle.adxSections[" + uIndex + "].sType (" + dxSection.sType + ") is not a known type in " + sArticleJSONFilePath));
+          };
+          var fReadSectionFromFile = dSection_fReadFromFile_by_sType[dxSection.sType];
+          fReadSectionFromFile(sSectionFilePath, dxSection, function (oError, oSection) {
+            if (bErrorReported) return;
+            if (oError) {
+              bErrorReported = true;
+              return fCallback(oError);
+            };
+            oArticle.aoSections[uIndex] = oSection;
+            if (++uSectionFilesRead == dxArticle.adxSections.length) return fCallback(null, oArticle);
+          });
+        };
       });
     });
   });
