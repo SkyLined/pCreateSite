@@ -41,7 +41,8 @@ function fCreateMainPage(oSite, dsTemplate_by_sFileName, fCallback) {
           .replace(/<<sLicenseImageRelativeURL>>/g, fsHTMLEncodeEntities(oSite.oLicense.sImageRelativeURL))
           .replace(/<<sLicenseDetailsAbsoluteURL>>/g, fsHTMLEncodeEntities(oSite.oLicense.sDetailsAbsoluteURL))
           .replace(/<<sSummary>>/g, fsHTMLEncodeEntities(oSite.sSummary))
-          .replace(/<<sSiteAbsoluteURL>>/g, fsHTMLEncodeEntities(oSite.sAbsoluteURL))
+          .replace(/<<sBaseAbsoluteURL>>/g, fsHTMLEncodeEntities(oSite.sBaseAbsoluteURL))
+          .replace(/<<sMainPageRelativeURL>>/g, fsHTMLEncodeEntities(oSite.sMainPageRelativeURL))
           .replace(/<<sBannerImageRelativeURL>>/g, fsHTMLEncodeEntities(sBannerImageRelativeURL))
           .replace(/<<sPageAvatarRelativeURL>>/g, fsHTMLEncodeEntities(oSite.sSiteAvatarRelativeURL))
           .replace(/<<sPageContentHTML>>/g, sPageContentHTML);

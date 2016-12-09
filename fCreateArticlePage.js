@@ -40,7 +40,8 @@ function fCreateArticlePage(oArticle, dsTemplate_by_sFileName, fCallback) {
           .replace(/<<sLicenseImageRelativeURL>>/g, fsHTMLEncodeEntities(oSite.oLicense.sImageRelativeURL))
           .replace(/<<sLicenseDetailsAbsoluteURL>>/g, fsHTMLEncodeEntities(oSite.oLicense.sDetailsAbsoluteURL))
           .replace(/<<sSummary>>/g, fsHTMLEncodeEntities(oArticle.sSummary))
-          .replace(/<<sSiteAbsoluteURL>>/g, fsHTMLEncodeEntities(oArticle.oSite.sAbsoluteURL))
+          .replace(/<<sBaseAbsoluteURL>>/g, fsHTMLEncodeEntities(oArticle.oSite.sBaseAbsoluteURL))
+          .replace(/<<sMainPageRelativeURL>>/g, fsHTMLEncodeEntities(oArticle.oSite.sMainPageRelativeURL))
           .replace(/<<sBannerImageRelativeURL>>/g, fsHTMLEncodeEntities(sBannerImageRelativeURL))
           .replace(/<<sPageAvatarRelativeURL>>/g, fsHTMLEncodeEntities(oSite.sSiteAvatarRelativeURL))
           .replace(/<<sPageContentHTML>>/g, sPageContentHTML);

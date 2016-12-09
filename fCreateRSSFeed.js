@@ -24,7 +24,8 @@ function fCreateRSSFeed(oSite, dsTemplate_by_sFileName, fCallback) {
   var sRSSFeedXML = dsTemplate_by_sFileName["RSS feed.xml"]
           .replace(/<<sSiteTitle>>/g, fsXMLEncodeEntities(oSite.sName))
           .replace(/<<sSiteSummary>>/g, fsXMLEncodeEntities(oSite.sSummary))
-          .replace(/<<sSiteAbsoluteURL>>/g, fsXMLEncodeEntities(oSite.sMainPageAbsoluteURL))
+          .replace(/<<sMainPageRelativeURL>>/g, fsXMLEncodeEntities(oSite.sMainPageRelativeURL))
+          .replace(/<<sBaseAbsoluteURL>>/g, fsXMLEncodeEntities(oSite.sBaseAbsoluteURL))
           .replace(/<<sArticlesXML>>/g, asArticleItemXML.join("\r\n"));
   if (sRSSFeedXML.indexOf("<<") != -1)
       throw new Error("Some template substitutions failed in the RSS feed: " + JSON.stringify(sRSSFeedXML));
