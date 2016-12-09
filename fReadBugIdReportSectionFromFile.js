@@ -63,6 +63,13 @@ function fReadBugIdReportSectionFromFile(sSectionFilePath, dxSection, fCallback)
     } else {
       return fCallback(new Error("BugId report synopsis does not appear to have a known format in " + sSectionFilePath));
     };
+    // Fix a bug in the JavaScript in older BugId reports that allows you to open and close the sub-sections:
+    if (sBugIdReportHTML.match(/function flipLegend\(\)/)) {
+      sBugIdReportHTML = sBugIdReportHTML
+          .replace(/flipLegend\(\)/g, "flipLegend(event)")
+          .replace(/;legend = event\.srcElement;/g, ";var legend = event.srcElement || event.target;");
+    };
+    
     return fCallback(null, {
       "sType": sType,
       "sName": "BugId report: " + sName,
