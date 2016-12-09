@@ -6,6 +6,7 @@ var mPath = require("path"),
 var dsTemplateFileName_by_sName = {
       "Page": "Page.html",
       "Main page content": "Main page content.html",
+      "Main page articles group": "Main page articles group.html",
       "Main page article": "Main page article.html",
       "Article page content": "Article page content.html",
       "Article BugId report section": "Article BugId report section.html",
