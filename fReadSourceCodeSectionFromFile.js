@@ -1,5 +1,6 @@
 module.exports = fReadSourceCodeSectionFromFile;
 var mPath = require("path"),
+    fsHTMLEncodeEntities = require("./fsHTMLEncodeEntities"),
     fReadFile = require("./fReadFile"),
     mHighlight = require("highlight.js");
 
@@ -33,7 +34,7 @@ function fReadSourceCodeSectionFromFile(sSectionFilePath, dxSection, fCallback) 
         return fCallback(oError);
       };
     } else {
-      sSourceCodeHTML = sSourceCode;
+      sSourceCodeHTML = fsHTMLEncodeEntities(sSourceCode);
     };
     var oSection = dxSection.sType == "Source code" ? {
       "sType": "source code",
