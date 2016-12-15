@@ -17,8 +17,8 @@ function fCreateArticlePage(oArticle, dsTemplate_by_sFileName, fCallback) {
           sSectionHTML = sSectionHTML.replace(/<<sSectionContentHTML>>/g, oSection.sContentHTML);
         };
         if (oSection.sAttachmentData) {
-          var sAttachmentRelativeURL = oArticle.sAttachmentsRelativeBaseURL + encodeURIComponent(oSection.sAttachmentFileName);
-          sSectionHTML = sSectionHTML.replace(/<<sAttachmentURL>>/g, fsHTMLEncodeEntities(sAttachmentRelativeURL));
+          var sAttachmentRelativeURL = oArticle.sAttachmentsBaseRelativeURL + encodeURIComponent(oSection.sAttachmentFileName);
+          sSectionHTML = sSectionHTML.replace(/<<sAttachmentRelativeURL>>/g, fsHTMLEncodeEntities(sAttachmentRelativeURL));
         };
         return sSectionHTML;
       });

@@ -25,7 +25,6 @@ function fauReverseSortedNumericKeys(dxValues_by_uNumber) {
   auNumbers.sort(function (uNumber1, uNumber2) {
     return uNumber2 - uNumber1;
   });
-  console.log(auNumbers);
   return auNumbers;
 };
 
@@ -48,7 +47,7 @@ function fCreateMainPage(oSite, dsTemplate_by_sFileName, fCallback) {
         .replace(/<<sArticleTitle>>/g, fsHTMLEncodeEntities(oArticle.sTitle))
         .replace(/<<sArticleSynopsisHTML>>/g, oArticle.sSynopsisHTML)
         .replace(/<<sArticleDate>>/g, fsHTMLEncodeEntities(oArticle.sDate))
-        .replace(/<<sArticleURL>>/g, fsHTMLEncodeEntities(oArticle.sPageRelativeURL));
+        .replace(/<<sArticleRelativeURL>>/g, fsHTMLEncodeEntities(oArticle.sRelativeURL));
     dsArticlesHTML_by_uSequenceNumber[oArticle.uSequenceNumber] = sArticleHTML;
   });
   // Create HTML for articles grouped by year and month

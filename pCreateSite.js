@@ -62,10 +62,8 @@ if (!sInputFolderPath || !sOutputFolderPath) {
           var sArticleID = oArticle.uSequenceNumber.toString();
           oArticle.oSite = oSite
           oArticle.sPageHTMLFilePath = mPath.join(sOutputFolderPath, sArticleID + ".html");
-          oArticle.sPageAbsoluteURL = sBaseAbsoluteURL + encodeURIComponent(sArticleID + ".html");
-          oArticle.sPageRelativeURL = sBaseRelativeURL + encodeURIComponent(sArticleID + ".html");
+          oArticle.sRelativeURL = sBaseRelativeURL + encodeURIComponent(sArticleID + ".html");
           oArticle.sAttachmentsFolderPath = mPath.join(sOutputFolderPath, sArticleID);
-          oArticle.sAttachmentsBaseAbsoluteURL = sBaseAbsoluteURL + encodeURIComponent(sArticleID) + "/";
           oArticle.sAttachmentsBaseRelativeURL = sBaseRelativeURL + encodeURIComponent(sArticleID) + "/";
         });
         fCreateArticles(oSite, dsTemplate_by_sFileName, function (oError) {

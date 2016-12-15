@@ -13,7 +13,8 @@ function fCreateRSSFeed(oSite, dsTemplate_by_sFileName, fCallback) {
             .replace(/<<sArticleTitle>>/g, fsXMLEncodeEntities(oArticle.sTitle))
             .replace(/<<sArticleDescription>>/g, fsXMLEncodeEntities(oArticle.sSynopsisHTML))
             .replace(/<<sArticleDescriptionText>>/g, fsXMLEncodeEntities(fsHTMLToText(oArticle.sSynopsisHTML)))
-            .replace(/<<sArticleAbsoluteURL>>/g, fsXMLEncodeEntities(oArticle.sPageAbsoluteURL))
+            .replace(/<<sBaseAbsoluteURL>>/g, fsXMLEncodeEntities(oSite.sBaseAbsoluteURL))
+            .replace(/<<sArticleRelativeURL>>/g, fsXMLEncodeEntities(oArticle.sRelativeURL))
             .replace(/<<sArticleDate>>/g, fsXMLEncodeEntities(oArticle.oDate.toString()));
     auSequenceNumbers.push(oArticle.uSequenceNumber);
     dsArticleItemXML_by_uSequenceNumber[oArticle.uSequenceNumber] = sArticleXML;
