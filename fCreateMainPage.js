@@ -1,8 +1,10 @@
 module.exports = fCreateMainPage;
-var fsHTMLEncodeEntities = require("./fsHTMLEncodeEntities"),
+var mPath = require("path"),
+    fsHTMLEncodeEntities = require("./fsHTMLEncodeEntities"),
     fWriteFile = require("./fWriteFile"),
     fsCreateTagIconsHTML = require("./fsCreateTagIconsHTML"),
-    fsInsertLineAndWordBreaksInHTML = require("./fsInsertLineAndWordBreaksInHTML");
+    fsInsertLineAndWordBreaksInHTML = require("./fsInsertLineAndWordBreaksInHTML"),
+    fsDate = require("./fsDate");
 
 var asMonths = [
   "January",
@@ -28,10 +30,10 @@ function fauReverseSortedNumericKeys(dxValues_by_uNumber) {
   return auNumbers;
 };
 
-function fCreateMainPage(oSite, dsTemplate_by_sFileName, fCallback) {
+function fCreateMainPage(oSite, aoArticles, dsTemplate_by_sFileName, fCallback) {
   // Create a tree of HTML for articles by year by month by sequencenumber
   var dddsArticlesHTML_by_uSequenceNumber_by_uMonth_by_uYear = {};
-  oSite.aoArticles.forEach(function(oArticle) {
+  aoArticles.forEach(function(oArticle) {
     if (!(oArticle.uYear in dddsArticlesHTML_by_uSequenceNumber_by_uMonth_by_uYear)) {
       dddsArticlesHTML_by_uSequenceNumber_by_uMonth_by_uYear[oArticle.uYear] = {};
     };
@@ -42,7 +44,7 @@ function fCreateMainPage(oSite, dsTemplate_by_sFileName, fCallback) {
     var dsArticlesHTML_by_uSequenceNumber = ddsArticlesHTML_by_uSequenceNumber_by_uMonth[oArticle.uMonth];
     if (oArticle.uSequenceNumber in dsArticlesHTML_by_uSequenceNumber)
         throw new Error("Two articles with sequence number " + oArticle.uSequenceNumber);
-    var sArticleHTML = dsTemplate_by_sFileName["Main page article.html"]
+    var sArticleHTML = dsTemplate_by_sFileName["Main page articles group article.html"]
         .replace(/<<sArticleTagIconsHTML>>/g, fsCreateTagIconsHTML(oArticle.asTags))
         .replace(/<<sArticleTitle>>/g, fsHTMLEncodeEntities(oArticle.sTitle))
         .replace(/<<sArticleSynopsisHTML>>/g, oArticle.sSynopsisHTML)
@@ -50,28 +52,28 @@ function fCreateMainPage(oSite, dsTemplate_by_sFileName, fCallback) {
         .replace(/<<sArticleRelativeURL>>/g, fsHTMLEncodeEntities(oArticle.sRelativeURL));
     dsArticlesHTML_by_uSequenceNumber[oArticle.uSequenceNumber] = sArticleHTML;
   });
-  // Create HTML for articles grouped by year and month
-  var auYears = fauReverseSortedNumericKeys(dddsArticlesHTML_by_uSequenceNumber_by_uMonth_by_uYear, true);
-  var sArticlesGroupsHTML = auYears.map(function (uYear) {
-    var ddsArticlesHTML_by_uSequenceNumber_by_uMonth = dddsArticlesHTML_by_uSequenceNumber_by_uMonth_by_uYear[uYear],
-        auMonths = fauReverseSortedNumericKeys(ddsArticlesHTML_by_uSequenceNumber_by_uMonth);
-    return auMonths.map(function (uMonth) {
-      var sGroupTitle = asMonths[uMonth - 1] + " " + uYear,
-          dsArticlesHTML_by_uSequenceNumber = ddsArticlesHTML_by_uSequenceNumber_by_uMonth[uMonth];
-          auSequenceNumbers = fauReverseSortedNumericKeys(dsArticlesHTML_by_uSequenceNumber);
-      var sArticlesHTML = auSequenceNumbers.map(function (uSequenceNumber) {
-            return dsArticlesHTML_by_uSequenceNumber[uSequenceNumber];
-          }).join(""),
-          sArticlesGroupHTML = dsTemplate_by_sFileName["Main page articles group.html"]
-              .replace(/<<sArticlesGroupTitle>>/g, fsHTMLEncodeEntities(sGroupTitle))
-              .replace(/<<sArticlesHTML>>/g, sArticlesHTML);
-      return sArticlesGroupHTML;
-    }).join("");
-  }).join("");
-  // Create the page
-  var sPageContentHTML = dsTemplate_by_sFileName["Main page.html"]
+  var auYears = fauReverseSortedNumericKeys(dddsArticlesHTML_by_uSequenceNumber_by_uMonth_by_uYear, true),
+      sArticlesGroupsHTML = auYears.map(function (uYear) {
+        var ddsArticlesHTML_by_uSequenceNumber_by_uMonth = dddsArticlesHTML_by_uSequenceNumber_by_uMonth_by_uYear[uYear],
+            auMonths = fauReverseSortedNumericKeys(ddsArticlesHTML_by_uSequenceNumber_by_uMonth);
+        return auMonths.map(function (uMonth) {
+          var sGroupTitle = fsDate(uYear, uMonth),
+              dsArticlesHTML_by_uSequenceNumber = ddsArticlesHTML_by_uSequenceNumber_by_uMonth[uMonth];
+              auSequenceNumbers = fauReverseSortedNumericKeys(dsArticlesHTML_by_uSequenceNumber);
+          var sArticlesHTML = auSequenceNumbers.map(function (uSequenceNumber) {
+                return dsArticlesHTML_by_uSequenceNumber[uSequenceNumber];
+              }).join(""),
+              sArticlesGroupHTML = dsTemplate_by_sFileName["Main page articles group.html"]
+                  .replace(/<<sArticlesGroupTitle>>/g, fsHTMLEncodeEntities(sGroupTitle))
+                  .replace(/<<sArticlesHTML>>/g, sArticlesHTML);
+          return sArticlesGroupHTML;
+        }).join("");
+      }).join(""),
+      sJavaScriptsHTML = oSite.asJavaScripts.map(sURL => {
+        return "<script src=\"" + fsHTMLEncodeEntities(sURL) + "\"></script>";
+      }).join(""),
+      sPageContentHTML = dsTemplate_by_sFileName["Main page.html"]
           .replace(/<<sArticlesGroupsHTML>>/g, sArticlesGroupsHTML),
-      sBannerImageRelativeURL = oSite.asBannerImageRelativeURLs[Math.floor(Math.random() * oSite.asBannerImageRelativeURLs.length)],
       sPageHTML = dsTemplate_by_sFileName["Page.html"]
           .replace(/<<sSiteCopyrightYear>>/g, fsHTMLEncodeEntities(oSite.sSiteCopyrightYear))
           .replace(/<<sSitelastUpdatedDate>>/g, fsHTMLEncodeEntities(oSite.sSitelastUpdatedDate))
@@ -88,11 +90,12 @@ function fCreateMainPage(oSite, dsTemplate_by_sFileName, fCallback) {
           .replace(/<<sSummary>>/g, fsHTMLEncodeEntities(oSite.sSummary))
           .replace(/<<sBaseAbsoluteURL>>/g, fsHTMLEncodeEntities(oSite.sBaseAbsoluteURL))
           .replace(/<<sMainPageRelativeURL>>/g, fsHTMLEncodeEntities(oSite.sMainPageRelativeURL))
-          .replace(/<<sBannerImageRelativeURL>>/g, fsHTMLEncodeEntities(sBannerImageRelativeURL))
           .replace(/<<sTwitterAvatarRelativeURL>>/g, fsHTMLEncodeEntities(oSite.sTwitterAvatarRelativeURL))
+          .replace(/<<sJavaScriptsHTML>>/g, sJavaScriptsHTML)
           .replace(/<<sPageContentHTML>>/g, sPageContentHTML);
   var asFailedSubstitution = sPageHTML.match(/<<.*?>>/);
   if (asFailedSubstitution)
       throw new Error("The substition failed for " + asFailedSubstitution[0] + " in the main page.");
-  fWriteFile(oSite.sMainPageHTMLFilePath, fsInsertLineAndWordBreaksInHTML(sPageHTML), fCallback);
+  var sMainPageHTMLFilePath = mPath.join(oSite.sOutputFolderPath, "index.html")
+  fWriteFile(sMainPageHTMLFilePath, fsInsertLineAndWordBreaksInHTML(sPageHTML), fCallback);
 };

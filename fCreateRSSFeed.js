@@ -1,12 +1,13 @@
 module.exports = fCreateRSSFeed;
-var fsHTMLToText = require("./fsHTMLToText"),
+var mPath = require("path"),
+    fsHTMLToText = require("./fsHTMLToText"),
     fsXMLEncodeEntities = require("./fsXMLEncodeEntities"),
     fWriteFile = require("./fWriteFile");
 
-function fCreateRSSFeed(oSite, dsTemplate_by_sFileName, fCallback) {
+function fCreateRSSFeed(oSite, aoArticles, dsTemplate_by_sFileName, fCallback) {
   var dsArticleItemXML_by_uSequenceNumber = {},
       auSequenceNumbers = [];
-  oSite.aoArticles.forEach(function(oArticle) {
+  aoArticles.forEach(function(oArticle) {
     if (oArticle.uSequenceNumber in dsArticleItemXML_by_uSequenceNumber)
         throw new Error("Two articles with sequence number " + oArticle.uSequenceNumber);
     var sArticleXML = dsTemplate_by_sFileName["RSS feed article.xml"]
@@ -32,5 +33,6 @@ function fCreateRSSFeed(oSite, dsTemplate_by_sFileName, fCallback) {
           .replace(/<<sArticlesXML>>/g, asArticleItemXML.join("\r\n"));
   if (sRSSFeedXML.indexOf("<<") != -1)
       throw new Error("Some template substitutions failed in the RSS feed: " + JSON.stringify(sRSSFeedXML));
-  fWriteFile(oSite.sRSSFeedXMLFilePath, sRSSFeedXML, fCallback);
+  var sRSSFeedXMLFilePath = mPath.join(oSite.sOutputFolderPath, "rss.xml");
+  fWriteFile(sRSSFeedXMLFilePath, sRSSFeedXML, fCallback);
 };

@@ -7,6 +7,7 @@ var mPath = require("path"),
 var dsLanguage_by_sSourceFileExtention = {
       ".asm":     "x86asm",
       ".asp":     "VBScript-HTML",
+      ".cmd":     null,
       ".cpp":     "CPP",
       ".html":    "HTML",
       ".http":    "HTTP",
@@ -22,7 +23,7 @@ var dsLanguage_by_sSourceFileExtention = {
 function fReadSourceCodeSectionFromFile(sSectionFilePath, dxSection, fCallback) {
   var sSectionFileExtention = mPath.extname(dxSection.sFileName);
   if (!(sSectionFileExtention in dsLanguage_by_sSourceFileExtention)) {
-    return fCallback(new Error("dxArticle.adxSections[" + uIndex + "].sFileName has an unknown extention (" + sSectionFileExtention + ") in " + sArticleJSONFilePath));
+    return fCallback(new Error("dxSection.sFileName has an unknown extention (" + sSectionFileExtention + ") in " + sSectionFilePath));
   };
   fReadFile(sSectionFilePath, function (oError, sSourceCode) {
     if (oError) return fCallback(oError);

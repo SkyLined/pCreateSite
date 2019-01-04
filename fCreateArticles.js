@@ -3,25 +3,26 @@ var mPath = require("path"),
     fCreateArticlePage = require("./fCreateArticlePage"),
     fCreateArticleAttachments = require("./fCreateArticleAttachments");
 
-function fCreateArticles(oSite, dsTemplate_by_sFileName, fCallback) {
-  if (oSite.aoArticles.length == 0) return fCallback();
+function fCreateArticles(oSite, aoArticles, dsTemplate_by_sFileName, fCallback) {
+  if (aoArticles.length == 0) return fCallback();
   var bErrorReported = false,
       uArticlesCreated = 0;
-  oSite.aoArticles.forEach(function (oArticle) {
+  console.log("Creating " + aoArticles.length + " articles for sub-domain " + oSite.sSubdomain + "...");
+  aoArticles.forEach(function (oArticle) {
     if (bErrorReported) return;
-    fCreateArticlePage(oArticle, dsTemplate_by_sFileName, function (oError) {
+    fCreateArticlePage(oSite, oArticle, dsTemplate_by_sFileName, function (oError) {
       if (bErrorReported) return;
       if (oError) {
         bErrorReported = true;
         return fCallback(oError);
       };
-      fCreateArticleAttachments(oArticle, function (oError) {
+      fCreateArticleAttachments(oSite, oArticle, function (oError) {
         if (bErrorReported) return;
         if (oError) {
           bErrorReported = true;
           return fCallback(oError);
         };
-        if (++uArticlesCreated == oSite.aoArticles.length) {
+        if (++uArticlesCreated == aoArticles.length) {
           return fCallback();
         };
       });

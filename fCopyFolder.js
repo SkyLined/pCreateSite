@@ -1,9 +1,8 @@
 module.exports = fCopyFolder;
 var mPath = require("path"),
+    fCopyFile = require("./fCopyFile"),
     fCreateFolderIfNotExists = require("./fCreateFolderIfNotExists"),
-    fReadBinaryFile = require("./fReadBinaryFile"),
     fReadFolder = require("./fReadFolder"),
-    fWriteFile = require("./fWriteFile"),
     fReadFolder = require("./fReadFolder"),
     fIsFolder = require("./fIsFolder");
 
@@ -46,22 +45,15 @@ function fCopyFolder(sFromFolderPath, sToFolderPath, fCallback) {
           } else {
             var sFromFilePath = mPath.join(sFromFolderPath, sFileOrFolderName),
                 sToFilePath = mPath.join(sToFolderPath, sFileOrFolderName);
-            fReadBinaryFile(sFromFilePath, function(oError, sData) {
+            fCopyFile(sFromFilePath, sToFilePath, function(oError) {
               if (bErrorReported) return;
               if (oError) {
                 bErrorReported = true;
                 return fCallback(oError);
               };
-              fWriteFile(sToFilePath, sData, function(oError) {
-                if (bErrorReported) return;
-                if (oError) {
-                  bErrorReported = true;
-                  return fCallback(oError);
-                };
-                if (++uFilesAndFoldersCopied == asFileAndFolderNames.length) {
-                  fCallback();
-                };
-              });
+              if (++uFilesAndFoldersCopied == asFileAndFolderNames.length) {
+                fCallback();
+              };
             });
           };
         });

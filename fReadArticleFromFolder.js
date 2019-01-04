@@ -3,8 +3,10 @@ var mPath = require("path"),
     fReadFileAsHTML = require("./fReadFileAsHTML"),
     fReadJSONFile = require("./fReadJSONFile"),
     fReadTextSectionFromFile = require("./fReadTextSectionFromFile"),
+    fReadImageSectionFromFile = require("./fReadImageSectionFromFile"),
     fReadBugIdReportSectionFromFile = require("./fReadBugIdReportSectionFromFile"),
-    fReadSourceCodeSectionFromFile = require("./fReadSourceCodeSectionFromFile");
+    fReadSourceCodeSectionFromFile = require("./fReadSourceCodeSectionFromFile"),
+    fsDate = require("./fsDate");
 
 // Each article folder should follow the format "YYYY-MM-DD#I ...", where "YYYY" is the year, "MM" is the month, "DD"
 // is the day, and "I" is an index (optional, defaults to 1, useful if you have more than one post in one day).
@@ -15,6 +17,7 @@ var rArticleFolderNameSequenceNumber = /^((\d{4})\-(\d{2})\-(\d{2}))(?:\#(\d+))?
     rArticleTitleSynopsis = /^\s*<h\d(?:\s+[^>]*)>(.+?)<\/h\d>\s+([\s\S]+?)\s*$/i,
     dSection_fReadFromFile_by_sType = {
       "Text": fReadTextSectionFromFile,
+      "Image": fReadImageSectionFromFile,
       "Source code": fReadSourceCodeSectionFromFile,
       "Source code snippet": fReadSourceCodeSectionFromFile,
       "BugId report": fReadBugIdReportSectionFromFile,
@@ -32,13 +35,14 @@ function fReadArticleFromFolder(sBaseFolderPath, sArticleFolderName, fCallback) 
       uArticleSequenceNumber = ((uYear * 100 + uMonth) * 100 + uDay) * 1000 + uIndex,
       oArticle = {
         "sSource": sArticleFolderName,
-        "sDate": asSequenceNumberComponents[1],
+        "sDate": fsDate(uYear, uMonth, uDay),
         "oDate": new Date(uYear, uMonth, uDay),
         "uYear": uYear, "uMonth": uMonth, "uDay": uDay, "uIndex": uIndex,
         "uSequenceNumber": uArticleSequenceNumber,
         "sTitle": void 0,
         "sSummary": void 0,
         "sSynopsisHTML": void 0,
+        "asSubdomains": [],
         "asTags": [],
         "aoSections": [],
       };
@@ -48,7 +52,7 @@ function fReadArticleFromFolder(sBaseFolderPath, sArticleFolderName, fCallback) 
     // dxArticle
     if (typeof dxArticle != "object") return fCallback(new Error("dxArticle is not an object in " + sArticleJSONFilePath));
     for (sSetting in dxArticle) {
-      if (!(sSetting in {"sTitle":0, "sSummary":0, "asTags":0, "sSynopsisFileName":0, "adxSections":0})) {
+      if (!(sSetting in {"sTitle":0, "sSummary":0, "asSubdomains":0, "asTags":0, "sSynopsisFileName":0, "adxSections":0})) {
         return fCallback(new Error("dxArticle." + sSetting + " is not a known article setting in " + sArticleJSONFilePath));
       };
     };
@@ -58,6 +62,17 @@ function fReadArticleFromFolder(sBaseFolderPath, sArticleFolderName, fCallback) 
     // dxArticle.sSummary
     if (typeof dxArticle.sSummary != "string") return fCallback(new Error("dxArticle.sSummary is not a string in " + sArticleJSONFilePath));
     oArticle.sSummary = dxArticle.sSummary;
+    // dxArticle.asSubdomains
+    if (!(dxArticle.asSubdomains instanceof Array)) return fCallback(new Error("dxArticle.asSubdomains is not an array in " + sArticleJSONFilePath));
+    var bErrorReported = false;
+    dxArticle.asSubdomains.forEach(function (sSubdomain, uIndex) {
+      if (typeof sSubdomain != "string") {
+        bErrorReported = true;
+        return fCallback(new Error("dxArticle.asSubdomains[" + uIndex + "] is not a string in " + sArticleJSONFilePath));
+      };
+    });
+    if (bErrorReported) return;
+    oArticle.asSubdomains = dxArticle.asSubdomains;
     // dxArticle.asTags
     if (!(dxArticle.asTags instanceof Array)) return fCallback(new Error("dxArticle.asTags is not an array in " + sArticleJSONFilePath));
     var bErrorReported = false;

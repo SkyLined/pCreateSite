@@ -15,9 +15,7 @@ var // BugId has changed over the years, so there are multiple formats we need t
 
 function fReadBugIdReportSectionFromFile(sSectionFilePath, dxSection, fCallback) {
   return fReadFile(sSectionFilePath, function (oError, sBugIdReportHTML) {
-    if (oError) {
-      return fCallback(oError);
-    };
+    if (oError) return fCallback(oError);
     var asBugIdSynopsisMatch = sBugIdReportHTML.match(rBugIdSynopsis),
         asOldBugIdSynopsisMatch1 = asBugIdSynopsisMatch ? null : sBugIdReportHTML.match(rOldBugIdSynopsis1),
         asOldBugIdSynopsisMatch2 = asBugIdSynopsisMatch || asOldBugIdSynopsisMatch1 ? null : sBugIdReportHTML.match(rOldBugIdSynopsis2);

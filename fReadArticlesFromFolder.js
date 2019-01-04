@@ -9,9 +9,12 @@ function fReadArticlesFromFolder(sArticlesFolderPath, fCallback) {
     if (asArticleFolderNames.length == 0)
         fCallback(new Error("No articles folders found in " + JSON.stringify(sArticlesFolderPath)));
     var bErrorReported = false,
-        aoArticles = [];
+        aoArticles = [],
+        uArticlesCount = 0;
     asArticleFolderNames.forEach(function (sArticleFolderName) {
       if (bErrorReported) return; // Do not process any more files after an error has been detected.
+      if (sArticleFolderName.startsWith("#")) return;
+      uArticlesCount++;
       fReadArticleFromFolder(sArticlesFolderPath, sArticleFolderName, function (oError, oArticle) {
         if (bErrorReported) return;
         if (oError) {
@@ -22,7 +25,7 @@ function fReadArticlesFromFolder(sArticlesFolderPath, fCallback) {
         // Record that one sub-folder was processed and call callback when all sub-folders have been processed.
         // Note: an error will result in an immediate callback and not in a call to this function, so the counter will
         // never reach the point where the callback is called again from this function.
-        if (aoArticles.length == asArticleFolderNames.length) {
+        if (aoArticles.length == uArticlesCount) {
           fCallback(oError, aoArticles);
         };
       });

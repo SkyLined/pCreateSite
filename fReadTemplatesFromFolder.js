@@ -3,19 +3,6 @@ var mPath = require("path"),
     fReadFolder = require("./fReadFolder"),
     fReadFile = require("./fReadFile");
 
-var dsTemplateFileName_by_sName = {
-      "Page": "Page.html",
-      "Main page content": "Main page content.html",
-      "Main page articles group": "Main page articles group.html",
-      "Main page article": "Main page article.html",
-      "Article page content": "Article page content.html",
-      "Article BugId report section": "Article BugId report section.html",
-      "Article source code section": "Article source code section.html",
-      "Article text section": "Article text section.html",
-      "RSS feed": "RSS feed.xml",
-      "RSS feed article": "RSS feed article.xml",
-    };
-
 function fReadTemplatesFromFolder(sTemplatesFolderPath, fCallback) {
   return fReadFolder(sTemplatesFolderPath, function (oError, asFileAndFolderNames) {
     if (oError) {

@@ -1,11 +1,15 @@
 var mPath = require("path"),
+    fCopyFile = require("./fCopyFile"),
     fCopyFolder = require("./fCopyFolder"),
+    fCreateFolderIfNotExists = require("./fCreateFolderIfNotExists"),
+    fsHTMLEncodeEntities = require("./fsHTMLEncodeEntities"),
     fReadJSONFile = require("./fReadJSONFile"),
     fReadTemplatesFromFolder = require("./fReadTemplatesFromFolder"),
     fReadArticlesFromFolder = require("./fReadArticlesFromFolder"),
     fCreateArticles = require("./fCreateArticles"),
     fCreateMainPage = require("./fCreateMainPage"),
-    fCreateRSSFeed = require("./fCreateRSSFeed");
+    fCreateRSSFeed = require("./fCreateRSSFeed"),
+    fsDate = require("./fsDate");
 
 var sInputFolderPath, sOutputFolderPath;
 process.argv.forEach(function (sArgument) {
@@ -24,57 +28,90 @@ if (!sInputFolderPath || !sOutputFolderPath) {
     if (oError) throw oError;
     var sTemplatesFolderPath = mPath.join(sInputFolderPath, dxSite["sTemplatesFolderPath"]),
         sArticlesFolderPath = mPath.join(sInputFolderPath, dxSite["sArticlesFolderPath"]),
-        sStaticFolderPath = mPath.join(sInputFolderPath, dxSite["sStaticFolderPath"]),
-        sBaseAbsoluteURL = dxSite["sBaseAbsoluteURL"],
-        sBaseRelativeURL = dxSite["sBaseRelativeURL"];
+        sStaticFolderPath = mPath.join(sInputFolderPath, dxSite["sStaticFolderPath"]);
     fReadTemplatesFromFolder(sTemplatesFolderPath, function (oError, dsTemplate_by_sFileName) {
       if (oError) throw oError;
       fReadArticlesFromFolder(sArticlesFolderPath, function (oError, aoArticles) {
         if (oError) throw oError;
-        var oDate = new Date(),
-            oSite = {
-              "sSiteCopyrightYear": oDate.getFullYear().toString(),
-              "sSitelastUpdatedDate": [oDate.getFullYear().toString(), oDate.getMonth().toString(), oDate.getDate().toString()].join("-"),
-              "sName": dxSite["sName"],
-              "oAuthor": {
-                "sName": dxSite["dxAuthor"]["sName"],
-                "sTwitterHandle": dxSite["dxAuthor"]["sTwitterHandle"],
-                "sGitHubHandle": dxSite["dxAuthor"]["sGitHubHandle"],
-                "sEmailAddress": dxSite["dxAuthor"]["sEmailAddress"],
-                "sBitcoin": dxSite["dxAuthor"]["sBitcoin"],
+        var oDate = new Date();
+        Object.keys(dxSite["dxSubdomains"]).forEach(function (sSubdomain) {
+          var dxSubdomain = dxSite["dxSubdomains"][sSubdomain],
+              asStaticFilePaths = dxSubdomain["asStaticFilePaths"],
+              sBaseAbsoluteURL = dxSubdomain["sBaseAbsoluteURL"],
+              sBaseRelativeURL = dxSubdomain["sBaseRelativeURL"],
+              oSite = {
+                "sSubdomain": sSubdomain,
+                "sOutputFolderPath": mPath.join(sOutputFolderPath, sSubdomain),
+                "sSiteCopyrightYear": oDate.getFullYear().toString(),
+                "sSitelastUpdatedDate": fsDate(oDate.getFullYear(), oDate.getMonth(), oDate.getDate()),
+                "sName": dxSubdomain["sName"],
+                "oAuthor": {
+                  "sName": dxSubdomain["dxAuthor"]["sName"],
+                  "sTwitterHandle": dxSubdomain["dxAuthor"]["sTwitterHandle"],
+                  "sGitHubHandle": dxSubdomain["dxAuthor"]["sGitHubHandle"],
+                  "sEmailAddress": dxSubdomain["dxAuthor"]["sEmailAddress"],
+                  "sBitcoin": dxSubdomain["dxAuthor"]["sBitcoin"],
+                },
+                "sAuthorTwitterHandle": dxSubdomain["sAuthorTwitterHandle"],
+                "oLicense": {
+                  "sDescription": dxSubdomain["dxLicense"]["sDescription"],
+                  "sImageRelativeURL": dxSubdomain["dxLicense"]["sImageRelativeURL"],
+                  "sDetailsAbsoluteURL": dxSubdomain["dxLicense"]["sDetailsAbsoluteURL"],
+                },
+                "sSummary": dxSubdomain["sSummary"],
+                "sBaseAbsoluteURL": sBaseAbsoluteURL,
+                "sMainPageRelativeURL": sBaseRelativeURL + "index.html",
+                "asBannerImageRelativeURLs": dxSubdomain["asBannerImageRelativeURLs"],
+                "sTwitterAvatarRelativeURL": dxSubdomain["sTwitterAvatarRelativeURL"],
+                "asJavaScripts": dxSubdomain["asJavaScripts"],
               },
-              "sAuthorTwitterHandle": dxSite["sAuthorTwitterHandle"],
-              "oLicense": {
-                "sDescription": dxSite["dxLicense"]["sDescription"],
-                "sImageRelativeURL": dxSite["dxLicense"]["sImageRelativeURL"],
-                "sDetailsAbsoluteURL": dxSite["dxLicense"]["sDetailsAbsoluteURL"],
-              },
-              "sSummary": dxSite["sSummary"],
-              "sMainPageHTMLFilePath": mPath.join(sOutputFolderPath, "index.html"),
-              "sRSSFeedXMLFilePath": mPath.join(sOutputFolderPath, "rss.xml"),
-              "sBaseAbsoluteURL": sBaseAbsoluteURL,
-              "sMainPageRelativeURL": sBaseRelativeURL + "index.html",
-              "asBannerImageRelativeURLs": dxSite["asBannerImageRelativeURLs"],
-              "sTwitterAvatarRelativeURL": dxSite["sTwitterAvatarRelativeURL"],
-              "aoArticles": aoArticles
+              aoSiteArticles = [];
+          // Add all articles that are relevant to this sub-domain.
+          aoArticles.forEach(function (oArticle) {
+            if (oArticle.asSubdomains.indexOf(sSubdomain) != -1) {
+              var sArticleID = oArticle.uSequenceNumber.toString();
+              oArticle.sRelativeURL = sBaseRelativeURL + encodeURIComponent(sArticleID + ".html");
+              oArticle.sAttachmentsBaseRelativeURL = sBaseRelativeURL + encodeURIComponent(sArticleID) + "/";
+              aoSiteArticles.push(oArticle);
             };
-        aoArticles.forEach(function (oArticle) {
-          var sArticleID = oArticle.uSequenceNumber.toString();
-          oArticle.oSite = oSite
-          oArticle.sPageHTMLFilePath = mPath.join(sOutputFolderPath, sArticleID + ".html");
-          oArticle.sRelativeURL = sBaseRelativeURL + encodeURIComponent(sArticleID + ".html");
-          oArticle.sAttachmentsFolderPath = mPath.join(sOutputFolderPath, sArticleID);
-          oArticle.sAttachmentsBaseRelativeURL = sBaseRelativeURL + encodeURIComponent(sArticleID) + "/";
-        });
-        fCreateArticles(oSite, dsTemplate_by_sFileName, function (oError) {
-          if (oError) fCallback(oError);
-          fCreateMainPage(oSite, dsTemplate_by_sFileName, function (oError) {
-            if (oError) fCallback(oError);
-            fCreateRSSFeed(oSite, dsTemplate_by_sFileName, function (oError) {
+          });
+          fCreateFolderIfNotExists(oSite.sOutputFolderPath, function (oError) {
+            fCreateArticles(oSite, aoSiteArticles, dsTemplate_by_sFileName, function (oError) {
               if (oError) throw oError;
-              fCopyFolder(sStaticFolderPath, sOutputFolderPath, function (oError) {
+              fCreateMainPage(oSite, aoSiteArticles, dsTemplate_by_sFileName, function (oError) {
                 if (oError) throw oError;
-                console.log("Site created");
+                fCreateRSSFeed(oSite, aoSiteArticles, dsTemplate_by_sFileName, function (oError) {
+                  if (oError) throw oError;
+                  var uStaticFilesAndFoldersCopied = 0;
+                  asStaticFilePaths.forEach(function (sStaticFilePath) {
+                    if (sStaticFilePath.substr(-2) == "\\*") {
+                      var sStaticFolderPath = sStaticFilePath.substr(0, sStaticFilePath.length - 2),
+                          sStaticInputFolderPath = mPath.join(sInputFolderPath, "Static", sStaticFolderPath),
+                          sStaticOutputFolderPath = mPath.join(oSite.sOutputFolderPath, sStaticFolderPath);
+                      fCopyFolder(sStaticInputFolderPath, sStaticOutputFolderPath, function (oError) {
+                        if (oError) throw oError;
+                        uStaticFilesAndFoldersCopied += 1;
+                        if (uStaticFilesAndFoldersCopied == asStaticFilePaths.length) {
+                          console.log("Site " + sSubdomain + " created");
+                        };
+                      });
+                    } else {
+                      var sStaticInputFilePath = mPath.join(sInputFolderPath, "Static", sStaticFilePath),
+                          sStaticOutputFilePath = mPath.join(oSite.sOutputFolderPath, sStaticFilePath),
+                          sStaticOutputFolderPath = mPath.dirname(sStaticOutputFilePath);
+                      fCreateFolderIfNotExists(sStaticOutputFolderPath, function (oError) {
+                        if (oError) throw oError;
+                        fCopyFile(sStaticInputFilePath, sStaticOutputFilePath, function (oError) {
+                          if (oError) throw oError;
+                          uStaticFilesAndFoldersCopied += 1;
+                          if (uStaticFilesAndFoldersCopied == asStaticFilePaths.length) {
+                            console.log("Site " + sSubdomain + " created");
+                          };
+                        });
+                      });
+                    };
+                  });
+                });
               });
             });
           });
