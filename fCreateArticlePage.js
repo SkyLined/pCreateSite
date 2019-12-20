@@ -24,7 +24,7 @@ function fCreateArticlePage(oSite, oArticle, dsTemplate_by_sFileName, fCallback)
           sSectionHTML = sSectionHTML.replace(/<<sAttachmentRelativeURL>>/g, fsHTMLEncodeEntities(sAttachmentRelativeURL));
         };
         return sSectionHTML;
-      });
+      }),
       sPageContentHTML = dsTemplate_by_sFileName["Article page.html"]
           .replace(/<<sArticleDate>>/g, fsHTMLEncodeEntities(oArticle.sDate))
           .replace(/<<sArticleTitle>>/g, fsHTMLEncodeEntities(oArticle.sTitle))
