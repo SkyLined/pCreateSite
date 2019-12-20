@@ -52,7 +52,7 @@ function fCreateMainPage(oSite, aoArticles, dsTemplate_by_sFileName, fCallback) 
         .replace(/<<sArticleRelativeURL>>/g, fsHTMLEncodeEntities(oArticle.sRelativeURL));
     dsArticlesHTML_by_uSequenceNumber[oArticle.uSequenceNumber] = sArticleHTML;
   });
-  var auYears = fauReverseSortedNumericKeys(dddsArticlesHTML_by_uSequenceNumber_by_uMonth_by_uYear, true),
+  var auYears = fauReverseSortedNumericKeys(dddsArticlesHTML_by_uSequenceNumber_by_uMonth_by_uYear),
       sArticlesGroupsHTML = auYears.map(function (uYear) {
         var ddsArticlesHTML_by_uSequenceNumber_by_uMonth = dddsArticlesHTML_by_uSequenceNumber_by_uMonth_by_uYear[uYear],
             auMonths = fauReverseSortedNumericKeys(ddsArticlesHTML_by_uSequenceNumber_by_uMonth);
