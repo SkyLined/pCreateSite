@@ -8,12 +8,12 @@ function fReadTemplatesFromFolder(sTemplatesFolderPath, fCallback) {
     if (oError) {
       return fCallback(oError);
     };
-    if (asFileAndFolderNames.length == 0) {
-      return fCallback(null, dsTemplate_by_sFileName);
-    };
     var bErrorReported = false,
         uFilesRead = 0,
         dsTemplate_by_sFileName = {};
+    if (asFileAndFolderNames.length == 0) {
+      return fCallback(null, dsTemplate_by_sFileName);
+    };
     // Assume only files exist in this folder:
     asFileAndFolderNames.forEach(function fReadTemplate(sTemplateFileName) {
       if (bErrorReported) return;
