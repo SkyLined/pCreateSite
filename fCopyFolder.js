@@ -3,7 +3,6 @@ var mPath = require("path"),
     fCopyFile = require("./fCopyFile"),
     fCreateFolderIfNotExists = require("./fCreateFolderIfNotExists"),
     fReadFolder = require("./fReadFolder"),
-    fReadFolder = require("./fReadFolder"),
     fIsFolder = require("./fIsFolder");
 
 function fCopyFolder(sFromFolderPath, sToFolderPath, fCallback) {
